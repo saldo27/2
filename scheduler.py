@@ -28,12 +28,15 @@ class Scheduler:
     def assign_worker(self, date, job):
         available_workers = self.get_available_workers(date, job)
         if not available_workers:
+            print(f"No available workers for job {job} on {date}")
             return None
         
         for worker in available_workers:
             if self.can_assign_shift(worker, date, job):
+                print(f"Worker {worker.id} can be assigned to job {job} on {date}")
                 return worker
         
+        print(f"No suitable workers found for job {job} on {date}")
         return None
 
     def get_available_workers(self, date, job):
@@ -48,6 +51,7 @@ class Scheduler:
                             available_workers.append(worker)
                 else:
                     available_workers.append(worker)
+        print(f"Available workers for job {job} on {date}: {[worker.id for worker in available_workers]}")
         return available_workers
 
     def can_assign_shift(self, worker, date, job):
