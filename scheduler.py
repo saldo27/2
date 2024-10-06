@@ -27,12 +27,10 @@ class Scheduler:
         if not available_workers:
             return None
         
-        # Example logic for assigning worker based on rotation and conditions
         for worker in available_workers:
             if self.can_assign_shift(worker, date, job):
                 return worker
         
-        # If no worker meets conditions, return None or handle exception
         return None
 
     def get_available_workers(self, date, job):
@@ -40,8 +38,8 @@ class Scheduler:
         for worker in self.workers:
             if job != worker.incompatible_job and date not in worker.day_off:
                 if worker.work_dates:
-                    for period in worker.work_dates:
-                        start, end = period
+                    for period in worker.work_dates.split(","):
+                        start, end = map(lambda x: datetime.strptime(x.strip(), "%d/%m/%y"), period.split("-"))
                         if start <= date <= end:
                             available_workers.append(worker)
                 else:
@@ -49,18 +47,15 @@ class Scheduler:
         return available_workers
 
     def can_assign_shift(self, worker, date, job):
-        # Check if worker has obligatory coverage on this date
         if worker.obligatory_coverage and date in worker.obligatory_coverage:
             return True
 
-        # Check for conditions like rotation, consecutive shifts, weekends, etc.
         if self.has_consecutive_shifts(worker, date) or self.has_consecutive_weekends(worker, date):
             return False
         
         return True
 
     def has_consecutive_shifts(self, worker, date):
-        # Check if worker has shifts in the last 4 days
         for i in range(1, 5):
             check_date = date - timedelta(days=i)
             for shift in self.shifts:
@@ -69,7 +64,6 @@ class Scheduler:
         return False
 
     def has_consecutive_weekends(self, worker, date):
-        # Check if worker has worked 3 consecutive weekends
         weekend_count = 0
         for i in range(1, 22, 7):  # Check last 3 weekends (21 days)
             check_date = date - timedelta(days=i)
@@ -79,4 +73,3 @@ class Scheduler:
                         weekend_count += 1
                         break
         return weekend_count >= 3
-    
