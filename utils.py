@@ -10,11 +10,13 @@ def input_date(prompt):
 def input_percentage(prompt):
     while True:
         try:
-            percentage = float(input(prompt))
+            percentage = input(prompt)
+            if percentage == "":
+                return 100.0
+            percentage = float(percentage)
             if 0 <= percentage <= 100:
                 return percentage
             else:
                 print("Percentage must be between 0 and 100.")
         except ValueError:
             print("Invalid percentage. Please enter a number.")
-    
