@@ -19,6 +19,9 @@ class Scheduler:
                     if worker:
                         shift = Shift(current_date, job, worker.id)
                         self.shifts.append(shift)
+                        print(f"Assigned Shift: {shift}")
+                    else:
+                        print(f"No available worker for job {job} on {current_date}")
             current_date += timedelta(days=1)
         return self.shifts
 
@@ -74,4 +77,3 @@ class Scheduler:
                         weekend_count += 1
                         break
         return weekend_count >= 3
-        
