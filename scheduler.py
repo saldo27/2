@@ -35,8 +35,9 @@ class Scheduler:
 
     def get_available_workers(self, date, job):
         available_workers = []
+        date_str = date.strftime("%d/%m/%y")
         for worker in self.workers:
-            if job != worker.incompatible_job and date not in worker.day_off:
+            if job != worker.incompatible_job and date_str not in worker.day_off:
                 if worker.work_dates:
                     for period in worker.work_dates.split(","):
                         start, end = map(lambda x: datetime.strptime(x.strip(), "%d/%m/%y"), period.split("-"))
@@ -73,3 +74,4 @@ class Scheduler:
                         weekend_count += 1
                         break
         return weekend_count >= 3
+        
