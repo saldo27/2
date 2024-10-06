@@ -1,0 +1,82 @@
+from models import Shift
+from datetime import timedelta, datetime
+
+class Scheduler:
+    def __init__(self, start_date, end_date, holidays, jobs, workers):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.holidays = holidays
+        self.jobs = jobs
+        self.workers = workers
+        self.shifts = []
+
+    def distribute_shifts(self):
+        current_date = self.start_date
+        while current_date <= self.end_date:
+            if current_date not in self.holidays:
+                for job in self.jobs:
+                    worker = self.assign_worker(current_date, job)
+                    if worker:
+                        shift = Shift(current_date, job, worker.id)
+                        self.shifts.append(shift)
+            current_date += timedelta(days=1)
+        return self.shifts
+
+    def assign_worker(self, date, job):
+        available_workers = self.get_available_workers(date, job)
+        if not available_workers:
+            return None
+        
+        # Example logic for assigning worker based on rotation and conditions
+        for worker in available_workers:
+            if self.can_assign_shift(worker, date, job):
+                return worker
+        
+        # If no worker meets conditions, return None or handle exception
+        return None
+
+    def get_available_workers(self, date, job):
+        available_workers = []
+        for worker in self.workers:
+            if job != worker.incompatible_job and date not in worker.day_off:
+                if worker.work_dates:
+                    for period in worker.work_dates:
+                        start, end = period
+                        if start <= date <= end:
+                            available_workers.append(worker)
+                else:
+                    available_workers.append(worker)
+        return available_workers
+
+    def can_assign_shift(self, worker, date, job):
+        # Check if worker has obligatory coverage on this date
+        if worker.obligatory_coverage and date in worker.obligatory_coverage:
+            return True
+
+        # Check for conditions like rotation, consecutive shifts, weekends, etc.
+        if self.has_consecutive_shifts(worker, date) or self.has_consecutive_weekends(worker, date):
+            return False
+        
+        return True
+
+    def has_consecutive_shifts(self, worker, date):
+        # Check if worker has shifts in the last 4 days
+        for i in range(1, 5):
+            check_date = date - timedelta(days=i)
+            for shift in self.shifts:
+                if shift.date == check_date and shift.worker_id == worker.id:
+                    return True
+        return False
+
+    def has_consecutive_weekends(self, worker, date):
+        # Check if worker has worked 3 consecutive weekends
+        weekend_count = 0
+        for i in range(1, 22, 7):  # Check last 3 weekends (21 days)
+            check_date = date - timedelta(days=i)
+            if check_date.weekday() in [4, 5, 6]:  # Friday, Saturday, Sunday
+                for shift in self.shifts:
+                    if shift.date == check_date and shift.worker_id == worker.id:
+                        weekend_count += 1
+                        break
+        return weekend_count >= 3
+    
