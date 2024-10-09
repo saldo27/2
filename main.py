@@ -1,51 +1,45 @@
-from models import Worker, Shift
-from scheduler import Scheduler
-from utils import input_date, input_percentage
-
-def main():
-    # Input date range
-    start_date = input_date("Enter the start date (DD/MM/YY): ")
-    end_date = input_date("Enter the end date (DD/MM/YY): ")
-    
-    # Input holidays
-    holidays = []
-    while True:
-        holiday = input("Enter a holiday date (DD/MM/YY) or leave blank to finish: ")
-        if holiday == "":
-            break
-        holidays.append(input_date(holiday))
-    
-    # Input jobs
-    jobs = []
-    while True:
-        job = input("Enter a job (A, B, C, ...) or leave blank to finish: ")
-        if job == "":
-            break
-        jobs.append(job)
-    
-    # Input workers
-    workers = []
-    num_workers = int(input("Enter the number of workers: "))
-    for _ in range(num_workers):
-        id = input("Enter worker ID: ")
-        work_dates = input("Enter work dates (DD/MM/YY-DD/MM/YY,...) or leave blank for full period: ")
-        percentage = input_percentage("Enter percentage of working day: ")
-        group = int(input("Enter worker group: "))
-        incompatible_job = input("Enter incompatible job (A, B, C, ...) or leave blank: ")
-        group_incompatibility = input("Enter group incompatibility: ")
-        obligatory_coverage = input("Enter obligatory coverage date (DD/MM/YY) or leave blank: ")
-        day_off = input("Enter day off date (DD/MM/YY) or leave blank: ")
-        
-        worker = Worker(id, work_dates, percentage, group, incompatible_job, group_incompatibility, obligatory_coverage, day_off)
-        workers.append(worker)
-    
-    # Initialize scheduler and distribute shifts
-    scheduler = Scheduler(start_date, end_date, holidays, jobs, workers)
-    shifts = scheduler.distribute_shifts()
-    
-    # Output shifts
-    for shift in shifts:
-        print(shift)
+from cli import run_cli
+import sys
+from PySide6.QtWidgets import QApplication
+from gui import MainWindow
+from worker import Worker
+from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown
 
 if __name__ == "__main__":
-    main()
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+    else:
+        print("QApplication instance already exists.")
+
+    window = MainWindow()
+    window.show()
+
+    # User input for the required parameters
+    work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
+    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
+    jobs = input("Enter workstations (e.g., A, B, C, separated by commas): ").split(',')
+    min_distance = int(input("Enter minimum distance between work shifts (in days): "))
+    max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
+    num_workers = int(input("Enter number of available workers: "))
+
+    # Example worker data, replace with actual data as needed
+    workers = [
+        Worker.from_user_input(
+            identification=f"W{i+1}",
+            working_dates="01/10/2024-15/10/2024,20/10/2024-31/10/2024",
+            percentage_shifts=100.0,
+            group='1',
+            position_incompatibility="",
+            group_incompatibility="",
+            obligatory_coverage="",
+            unavailable_dates=""
+        ) for i in range(num_workers)
+    ]
+
+    # Schedule shifts
+    schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
+    breakdown = prepare_breakdown(schedule)
+    export_breakdown(breakdown)
+
+    sys.exit(app.exec())
