@@ -43,7 +43,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
         date = datetime.strptime(date.strip(), "%d/%m/%Y")  # Ensure date is a datetime object
 
     # Check for group incompatibility
-    if schedule:
+    if schedule and workers:
         for job_schedule in schedule.values():
             if date.strftime("%d/%m/%Y") in job_schedule:
                 assigned_worker_id = job_schedule[date.strftime("%d/%m/%Y")]
@@ -57,7 +57,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
     if date in [datetime.strptime(day.strip(), "%d/%m/%Y") for day in worker.unavailable_dates if day]:
         logging.debug(f"Worker {worker.identification} cannot work on {date} due to unavailability.")
         return False
-        
+
     # Check if the date is within the worker's working dates range
     for start_date, end_date in worker.work_dates:
         if start_date <= date <= end_date:
@@ -66,7 +66,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
         logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
         return False
 
-     # Adjust the min_distance based on the worker's percentage of shifts
+    # Adjust the min_distance based on the worker's percentage of shifts
     adjusted_min_distance = max(1, int(min_distance * (100 / worker.percentage_shifts)))
 
     if not override:
@@ -190,9 +190,9 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 max_iterations = len(workers) * 2
 
                 while not assigned:
-                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule)]
+                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers)]
                     if not available_workers:
-                        available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=True, schedule=schedule)]
+                        available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=True, schedule=schedule, workers=workers)]
                         if available_workers:
                             worker = available_workers[0]
                             break
@@ -200,6 +200,20 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                             logging.error(f"No available workers for job {job} on {date_str}.")
                             assigned = True
                             break
+
+                    # Maximize the gap between shifts
+                    worker = max(available_workers, key=lambda w: ((date - last_shift_date[w.identification]).days, w.shift_quota, w.percentage_shifts))
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                    logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
+                    assigned = True
+
+                    iteration_count += 1
+                    if iteration_count >= max_iterations:
+                        logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
+                        assigned = True
+
+    logging.debug(f"Final schedule: {schedule}")
+    return schedule
 
                     # Maximize the gap between shifts
                     worker = max(available_workers, key=lambda w: ((date - last_shift_date[w.identification]).days, w.shift_quota, w.percentage_shifts))
