@@ -213,21 +213,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     logging.debug(f"Final schedule: {schedule}")
     return schedule
-
-                    # Maximize the gap between shifts
-                    worker = max(available_workers, key=lambda w: ((date - last_shift_date[w.identification]).days, w.shift_quota, w.percentage_shifts))
-                    assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
-                    logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
-                    assigned = True
-
-                    iteration_count += 1
-                    if iteration_count >= max_iterations:
-                        logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
-                        assigned = True
-
-    logging.debug(f"Final schedule: {schedule}")
-    return schedule
-    
+                       
 if __name__ == "__main__":
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
