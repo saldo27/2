@@ -1,4 +1,6 @@
 import logging
+logging.basicConfig(level=logging.DEBUG)
+# Existing imports
 from datetime import timedelta, datetime
 from collections import defaultdict
 import csv
@@ -40,16 +42,19 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
     if isinstance(date, str) and date:  # Check if date is a non-empty string
         date = datetime.strptime(date.strip(), "%d/%m/%Y")  # Ensure date is a datetime object
     # Check for group incompatibility
+    # Check for group incompatibility
     if schedule and job in schedule and date.strftime("%d/%m/%Y") in schedule[job]:
         assigned_worker_id = schedule[job][date.strftime("%d/%m/%Y")]
         assigned_worker = next((w for w in workers if w.identification == assigned_worker_id), None)
-        if assigned_worker and any(group in assigned_worker.group for group in worker.group_incompatibility):
-            logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
-            return False
+        if assigned_worker:
+            logging.debug(f"Assigned worker {assigned_worker.identification} found for job {job} on {date}")
+            if any(group in assigned_worker.group for group in worker.group_incompatibility):
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
+                return False
     if date in [datetime.strptime(day.strip(), "%d/%m/%Y") for day in worker.unavailable_dates if day]:
         logging.debug(f"Worker {worker.identification} cannot work on {date} due to unavailability.")
         return False
-
+        
     # Check if the date is within the worker's working dates range
     for start_date, end_date in worker.work_dates:
         if start_date <= date <= end_date:
