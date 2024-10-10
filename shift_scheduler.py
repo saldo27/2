@@ -195,7 +195,6 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=True, schedule=schedule, workers=workers)]
                         if available_workers:
                             worker = available_workers[0]
-                            break
                         else:
                             logging.error(f"No available workers for job {job} on {date_str}.")
                             assigned = True
