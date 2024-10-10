@@ -38,19 +38,22 @@ def is_holiday(date_str, holidays_set):
     else:
         return False
 
-def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=False, schedule=None):
+def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=False, schedule=None, workers=None):
     if isinstance(date, str) and date:  # Check if date is a non-empty string
         date = datetime.strptime(date.strip(), "%d/%m/%Y")  # Ensure date is a datetime object
+
     # Check for group incompatibility
-    # Check for group incompatibility
-    if schedule and job in schedule and date.strftime("%d/%m/%Y") in schedule[job]:
-        assigned_worker_id = schedule[job][date.strftime("%d/%m/%Y")]
-        assigned_worker = next((w for w in workers if w.identification == assigned_worker_id), None)
-        if assigned_worker:
-            logging.debug(f"Assigned worker {assigned_worker.identification} found for job {job} on {date}")
-            if any(group in assigned_worker.group for group in worker.group_incompatibility):
-                logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
-                return False
+    if schedule:
+        for job_schedule in schedule.values():
+            if date.strftime("%d/%m/%Y") in job_schedule:
+                assigned_worker_id = job_schedule[date.strftime("%d/%m/%Y")]
+                assigned_worker = next((w for w in workers if w.identification == assigned_worker_id), None)
+                if assigned_worker:
+                    logging.debug(f"Assigned worker {assigned_worker.identification} found for job on {date}")
+                    if any(group == assigned_worker.group for group in worker.group_incompatibility):
+                        logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
+                        return False
+
     if date in [datetime.strptime(day.strip(), "%d/%m/%Y") for day in worker.unavailable_dates if day]:
         logging.debug(f"Worker {worker.identification} cannot work on {date} due to unavailability.")
         return False
@@ -63,7 +66,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
         logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
         return False
 
-    # Adjust the min_distance based on the worker's percentage of shifts
+     # Adjust the min_distance based on the worker's percentage of shifts
     adjusted_min_distance = max(1, int(min_distance * (100 / worker.percentage_shifts)))
 
     if not override:
@@ -175,7 +178,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                     continue  # Continue if inner loop wasn't broken
                 break  # Exit outer loop once a shift is assigned
 
-     # Assign remaining shifts
+    # Assign remaining shifts
     for start_date, end_date in valid_work_periods:
         for date in generate_date_range(start_date, end_date):
             date_str = date.strftime("%d/%m/%Y")
