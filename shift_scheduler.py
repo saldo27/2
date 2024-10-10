@@ -141,6 +141,8 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     last_shift_date = {worker.identification: past_date for worker in workers}
     job_count = {worker.identification: {job: 0 for job in jobs} for worker in workers}
     weekly_tracker = defaultdict(lambda: defaultdict(int))
+    last_assigned_job = {worker.identification: None for worker in workers}
+    last_assigned_day = {worker.identification: None for worker in workers}
 
     valid_work_periods = []
     for period in work_periods:
@@ -171,6 +173,8 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 for job in jobs:
                     if can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers):
                         assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                        last_assigned_job[worker.identification] = job
+                        last_assigned_day[worker.identification] = date.weekday()
                         logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
                         break
                 else:
@@ -200,9 +204,17 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                             assigned = True
                             break
 
-                    # Maximize the gap between shifts
-                    worker = max(available_workers, key=lambda w: ((date - last_shift_date[w.identification]).days, w.shift_quota, w.percentage_shifts))
+                    # Maximize the gap between shifts and ensure rotation
+                    worker = max(available_workers, key=lambda w: (
+                        (date - last_shift_date[w.identification]).days,
+                        w.shift_quota,
+                        w.percentage_shifts,
+                        last_assigned_job[w.identification] != job,
+                        last_assigned_day[w.identification] != date.weekday()
+                    ))
                     assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                    last_assigned_job[worker.identification] = job
+                    last_assigned_day[worker.identification] = date.weekday()
                     logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
                     assigned = True
 
