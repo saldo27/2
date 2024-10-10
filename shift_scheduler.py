@@ -143,6 +143,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     weekly_tracker = defaultdict(lambda: defaultdict(int))
     last_assigned_job = {worker.identification: None for worker in workers}
     last_assigned_day = {worker.identification: None for worker in workers}
+    day_rotation_tracker = {worker.identification: {i: False for i in range(7)} for worker in workers}
 
     valid_work_periods = []
     for period in work_periods:
@@ -175,6 +176,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
                         last_assigned_job[worker.identification] = job
                         last_assigned_day[worker.identification] = date.weekday()
+                        day_rotation_tracker[worker.identification][date.weekday()] = True
                         logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
                         break
                 else:
@@ -210,11 +212,13 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         w.shift_quota,
                         w.percentage_shifts,
                         last_assigned_job[w.identification] != job,
-                        last_assigned_day[w.identification] != date.weekday()
+                        last_assigned_day[w.identification] != date.weekday(),
+                        not day_rotation_tracker[w.identification][date.weekday()]
                     ))
                     assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
                     last_assigned_job[worker.identification] = job
                     last_assigned_day[worker.identification] = date.weekday()
+                    day_rotation_tracker[worker.identification][date.weekday()] = True
                     logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
                     assigned = True
 
