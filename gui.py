@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QAction
 from worker import Worker
-from shift_scheduler import schedule_shifts
+from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown
 from icalendar import Calendar, Event
 from pdf_exporter import export_schedule_to_pdf
 from reportlab.lib.pagesizes import letter
