@@ -1,10 +1,8 @@
 import sys
 from datetime import datetime
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem (
-    QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
-    QLineEdit, QPushButton, QTextEdit, QFileDialog, QGridLayout,
-    QScrollArea
-)
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
+    QLineEdit, QPushButton, QTextEdit, QFileDialog, QGridLayout, QScrollArea
+
 from PySide6.QtGui import QAction
 from worker import Worker
 from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown
