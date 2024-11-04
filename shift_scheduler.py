@@ -67,6 +67,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
         return False
 
     if not override:
+        # Check across all workstations
         for assigned_worker_id, last_date in last_shift_date.items():
             if isinstance(last_date, str) and last_date:  # Ensure non-empty strings
                 last_date = datetime.strptime(last_date.strip(), "%d/%m/%Y")
