@@ -206,8 +206,8 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                     logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
                     return schedule
 
-logging.debug(f"Final schedule: {schedule}")
-return schedule
+    logging.debug(f"Final schedule: {schedule}")
+    return schedule
 
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
