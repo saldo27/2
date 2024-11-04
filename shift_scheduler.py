@@ -75,8 +75,9 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             if isinstance(last_date, str) and last_date:  # Ensure non-empty strings
                 last_date = datetime.strptime(last_date.strip(), "%d/%m/%Y")
             if last_date:
-                if (date - last_date).days < adjusted_min_distance:
-                    logging.debug(f"Worker {worker.identification} cannot work on {date} due to recent shift on {last_date}.")
+                days_diff = (date - last_date).days
+                if days_diff < adjusted_min_distance or days_diff in {7, 14, 21}:
+                    logging.debug(f"Worker {worker.identification} cannot work on {date} due to recent shift on {last_date} or invalid interval.")
                     return False
                 if last_date.date() == date.date():
                     logging.debug(f"Worker {worker.identification} cannot work on {date} because they already have a shift on this day.")
