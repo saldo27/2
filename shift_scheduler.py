@@ -77,7 +77,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             if last_date:
                 days_diff = (date - last_date).days
                 logging.debug(f"Worker {assigned_worker_id} last worked on {last_date}, {days_diff} days ago.")
-                if days_diff < adjusted_min_distance or days_diff in {7, 14, 21}:
+                if days_diff < adjusted_min_distance or (days_diff in {7, 14, 21} and job == last_shift_date[assigned_worker_id].job):
                     logging.debug(f"Worker {assigned_worker_id} cannot work on {date} due to recent shift on {last_date} or invalid interval.")
                     return False
                 if last_date.date() == date.date():
@@ -99,6 +99,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             return False
 
     return True
+    
 def assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week):
     # Adjust the min_distance based on the worker's percentage of shifts
     adjusted_min_distance = max(1, int(min_distance * (worker.percentage_shifts / 100.0)))
