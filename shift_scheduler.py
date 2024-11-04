@@ -222,6 +222,9 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     logging.debug(f"Final schedule: {schedule}")
     return schedule
+
+    logging.debug(f"Final schedule: {schedule}")
+    return schedule
                        
 if __name__ == "__main__":
     # User input for the required parameters
