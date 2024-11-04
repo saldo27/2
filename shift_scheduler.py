@@ -200,9 +200,8 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         if available_workers:
                             worker = available_workers[0]
                         else:
-                            logging.error(f"No available workers for job {job} on {date_str}.")
-                            assigned = True
-                            break
+                            logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
+                            return schedule
 
                     # Maximize the gap between shifts and ensure rotation
                     worker = max(available_workers, key=lambda w: (
@@ -223,7 +222,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                     iteration_count += 1
                     if iteration_count >= max_iterations:
                         logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
-                        assigned = True
+                        return schedule
 
     logging.debug(f"Final schedule: {schedule}")
     return schedule
