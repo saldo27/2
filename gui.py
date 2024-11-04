@@ -31,10 +31,12 @@ class MainWindow(QMainWindow):
         self.schedule_button = QPushButton("Schedule Shifts")
         self.export_ical_button = QPushButton("Export to iCalendar")
         self.export_pdf_button = QPushButton("Export to PDF")
+        self.breakdown_button = QPushButton("Breakdown by Worker")
         # Connect buttons to functions
         self.schedule_button.clicked.connect(self.schedule_shifts)
         self.export_ical_button.clicked.connect(self.export_to_ical)
         self.export_pdf_button.clicked.connect(self.export_to_pdf)
+        self.breakdown_button.clicked.connect(self.display_breakdown)
         # Setup layout
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Enter work periods (comma-separated, e.g., '01/10/2024-10/10/2024'):"))
@@ -49,6 +51,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.max_shifts_per_week_input)
         layout.addWidget(QLabel("Enter number of workers:"))
         layout.addWidget(self.num_workers_input)
+        layout.addWidget(self.breakdown_button)
                 
         # Worker inputs layout
         self.worker_layout = QGridLayout()
@@ -183,7 +186,11 @@ class MainWindow(QMainWindow):
                 cal.add_component(event)
         with open(filePath, 'wb') as f:
             f.write(cal.to_ical())
-
+    def display_breakdown(self):
+        breakdown = prepare_breakdown(self.schedule)
+        output = export_breakdown(breakdown)
+        self.output_display.setText(output)
+        
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
