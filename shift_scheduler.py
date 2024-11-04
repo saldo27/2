@@ -74,8 +74,11 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             if last_date:
                 days_diff = (date - last_date).days
                 logging.debug(f"Worker {assigned_worker_id} last worked on {last_date}, {days_diff} days ago.")
-                if days_diff < min_distance or days_diff in {7, 14, 21}:
+                if days_diff < min_distance:
                     logging.debug(f"Worker {assigned_worker_id} cannot work on {date} due to invalid interval.")
+                    return False
+                if days_diff in {7, 14, 21}:
+                    logging.debug(f"Worker {assigned_worker_id} cannot work on {date} due to 7, 14, or 21 days constraint.")
                     return False
                 if last_date.date() == date.date():
                     logging.debug(f"Worker {assigned_worker_id} cannot work on {date} because they already have a shift on this day.")
