@@ -159,15 +159,13 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     total_weeks = (total_days // 7) + 1
     calculate_shift_quota(workers, total_shifts, total_weeks)
 
-    # Assign obligatory coverage shifts first
     for worker in workers:
-        # Default work_dates to work_periods if blank
         if not worker.work_dates:
             worker.work_dates = valid_work_periods
 
         for date_str in worker.obligatory_coverage:
-            if date_str.strip():  # Ensure non-empty strings
-                date = datetime.strptime(date_str.strip(), "%d/%m/%Y")  # Trim spaces here
+            if date_str.strip():
+                date = datetime.strptime(date_str.strip(), "%d/%m/%Y")
                 logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
                 for job in jobs:
                     if can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers):
@@ -179,10 +177,9 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         break
                 else:
                     logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
-                    continue  # Continue if inner loop wasn't broken
-                break  # Exit outer loop once a shift is assigned
+                    continue
+                break
 
-    # Assign remaining shifts
     for start_date, end_date in valid_work_periods:
         for date in generate_date_range(start_date, end_date):
             date_str = date.strftime("%d/%m/%Y")
@@ -190,7 +187,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 logging.debug(f"Processing job '{job}' on date {date_str}")
 
                 assigned = False
-                iteration_count = 0  # Initialize iteration_count
+                iteration_count = 0
                 max_iterations = len(workers) * 2
 
                 while not assigned:
@@ -203,7 +200,6 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                             logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
                             return schedule
 
-                    # Maximize the gap between shifts and ensure rotation
                     worker = max(available_workers, key=lambda w: (
                         (date - last_shift_date[w.identification]).days,
                         w.shift_quota,
