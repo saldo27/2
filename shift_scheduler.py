@@ -66,9 +66,6 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
         logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
         return False
 
-    # Adjust the min_distance based on the worker's percentage of shifts
-    adjusted_min_distance = max(1, int(min_distance * (100 / worker.percentage_shifts)))
-
     if not override:
         for assigned_worker_id in last_shift_date:
             last_date = last_shift_date[assigned_worker_id]
@@ -77,8 +74,8 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             if last_date:
                 days_diff = (date - last_date).days
                 logging.debug(f"Worker {assigned_worker_id} last worked on {last_date}, {days_diff} days ago.")
-                if days_diff < adjusted_min_distance or (days_diff in {7, 14, 21} and job == last_shift_date[assigned_worker_id].job):
-                    logging.debug(f"Worker {assigned_worker_id} cannot work on {date} due to recent shift on {last_date} or invalid interval.")
+                if days_diff < min_distance or days_diff in {7, 14, 21}:
+                    logging.debug(f"Worker {assigned_worker_id} cannot work on {date} due to invalid interval.")
                     return False
                 if last_date.date() == date.date():
                     logging.debug(f"Worker {assigned_worker_id} cannot work on {date} because they already have a shift on this day.")
@@ -113,7 +110,6 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend
         weekend_tracker[worker.identification] += 1
     worker.shift_quota -= 1
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
-
 
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
