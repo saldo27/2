@@ -18,11 +18,12 @@ class Worker:
         self.obligatory_coverage = obligatory_coverage if obligatory_coverage else []
         self.day_off = day_off if day_off else []
 
-def calculate_shift_quota(workers, total_shifts, total_weeks):
+def calculate_shift_quota(workers, total_days, jobs_per_day):
     total_percentage = sum(worker.percentage_shifts for worker in workers)
+    total_shifts = total_days * jobs_per_day
     for worker in workers:
-        worker.shift_quota = (worker.percentage_shifts / total_percentage) * total_shifts
-        worker.weekly_shift_quota = worker.shift_quota / total_weeks
+        worker.shift_quota = (worker.percentage_shifts / 100) * (total_days * jobs_per_day) / (total_percentage / 100)
+        worker.weekly_shift_quota = worker.shift_quota / ((total_days // 7) + 1)
 
 def generate_date_range(start_date, end_date):
     for n in range(int((end_date - start_date).days) + 1):
@@ -107,7 +108,7 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weeken
         weekend_tracker[worker.identification] += 1
     worker.shift_quota -= 1
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
-    
+
 def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):
     logging.debug(f"Workers: {workers}")
     logging.debug(f"Work Periods: {work_periods}")
@@ -136,9 +137,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     total_days = sum((end_date - start_date).days + 1 for start_date, end_date in valid_work_periods)
     jobs_per_day = len(jobs)
-    total_shifts = total_days * jobs_per_day
-    total_weeks = (total_days // 7) + 1
-    calculate_shift_quota(workers, total_shifts, total_weeks)
+    calculate_shift_quota(workers, total_days, jobs_per_day)
 
     for worker in workers:
         if not worker.work_dates:
@@ -216,7 +215,7 @@ def export_breakdown(breakdown):
         for date, job in shifts:
             output += f"  {date}: {job}\n"
     return output
-                      
+
 if __name__ == "__main__":
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
