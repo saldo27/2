@@ -186,6 +186,7 @@ class MainWindow(QMainWindow):
                 cal.add_component(event)
         with open(filePath, 'wb') as f:
             f.write(cal.to_ical())
+            
     def display_breakdown(self):
         breakdown = prepare_breakdown(self.schedule)
         output = export_breakdown(breakdown)
