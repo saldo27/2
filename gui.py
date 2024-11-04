@@ -1,7 +1,9 @@
 import sys
 from datetime import datetime
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
+from PySide6.QtWidgets import (
+    QTableWidget, QTableWidgetItem, QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
     QLineEdit, QPushButton, QTextEdit, QFileDialog, QGridLayout, QScrollArea
+)
 
 from PySide6.QtGui import QAction
 from worker import Worker
