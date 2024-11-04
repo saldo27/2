@@ -38,7 +38,7 @@ def is_holiday(date_str, holidays_set):
     else:
         return False
 
-def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=False, schedule=None, workers=None):
+def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=False, schedule=None, workers=None):
     if isinstance(date, str) and date:  # Check if date is a non-empty string
         date = datetime.strptime(date.strip(), "%d/%m/%Y")  # Ensure date is a datetime object
 
@@ -68,12 +68,8 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
 
     if not override:
         # Check across all workstations for the current worker
-        if isinstance(last_shift_date[worker.identification], str) and last_shift_date[worker.identification]:  # Ensure non-empty strings
-            last_date = datetime.strptime(last_shift_date[worker.identification].strip(), "%d/%m/%Y")
-        else:
-            last_date = last_shift_date[worker.identification]
-        
-        if last_date:
+        if last_shift_dates[worker.identification]:
+            last_date = last_shift_dates[worker.identification][-1]
             days_diff = (date - last_date).days
             logging.debug(f"Worker {worker.identification} last worked on {last_date}, {days_diff} days ago.")
             if days_diff < min_distance:
@@ -84,7 +80,6 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
                 return False
             if last_date.date() == date.date():
                 logging.debug(f"Worker {worker.identification} cannot work on {date} because they already have a shift on this day.")
-                return False
 
         if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
             if weekend_tracker[worker.identification] >= 4:
@@ -96,7 +91,7 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekly quota limit.")
             return False
 
-        if job in job_count[worker.identification] and job_count[worker.identification][job] > 0 and (date - last_shift_date[worker.identification]).days == 1:
+        if job in job_count[worker.identification] and job_count[worker.identification][job] > 0 and (date - last_shift_dates[worker.identification][-1]).days == 1:
             logging.debug(f"Worker {worker.identification} cannot work on {date} due to job repetition limit.")
             return False
 
