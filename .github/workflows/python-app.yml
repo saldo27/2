@@ -3,6 +3,9 @@
 
 name: Python application
 
+def test_dummy():
+    pass
+    
 on:
   push:
     branches: [ "main" ]
