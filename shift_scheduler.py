@@ -99,7 +99,6 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             return False
 
     return True
-
 def assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week):
     # Adjust the min_distance based on the worker's percentage of shifts
     adjusted_min_distance = max(1, int(min_distance * (worker.percentage_shifts / 100.0)))
