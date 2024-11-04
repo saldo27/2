@@ -72,8 +72,8 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
     if not override:
         if worker.identification in last_shift_date:
             last_date = last_shift_date[worker.identification]
-        if isinstance(last_date, str) and last_date:  # Ensure non-empty strings
-            last_date = datetime.strptime(last_date.strip(), "%d/%m/%Y")
+            if isinstance(last_date, str) and last_date:  # Ensure non-empty strings
+                last_date = datetime.strptime(last_date.strip(), "%d/%m/%Y")
         if last_date:
             days_diff = (date - last_date).days
             logging.debug(f"Worker {worker.identification} last worked on {last_date}, {days_diff} days ago.")
