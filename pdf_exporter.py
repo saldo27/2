@@ -13,7 +13,7 @@ class PDFCalendar(FPDF):
         self.ln(10)
 
         # Create a table for the calendar
-        self.set_font('Arial', 'B', 7)  # Set font size to 7
+        self.set_font('Arial', 'B', 8)  # Set font size to 7
         days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         for day in days:
             self.cell(25, 10, day, 1, 0, 'C')
@@ -21,7 +21,7 @@ class PDFCalendar(FPDF):
 
         cal = calendar.Calendar(firstweekday=0)
         month_days = cal.monthdayscalendar(year, month)
-        self.set_font('Arial', '', 7)  # Set font size to 7
+        self.set_font('Arial', '', 8)  # Set font size to 7
 
         for week in month_days:
             for day in week:
@@ -39,7 +39,7 @@ class PDFCalendar(FPDF):
             if self.get_y() + 20 > self.page_break_trigger:  # Adjusted height for content
                 self.add_page()
                 self.set_y(self.t_margin)
-                self.set_font('Arial', 'B', 7)
+                self.set_font('Arial', 'B', 8)
                 for day in days:
                     self.cell(25, 10, day, 1, 0, 'C')
                 self.ln()
