@@ -1,6 +1,6 @@
 import sys
 from datetime import datetime
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem (
     QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget,
     QLineEdit, QPushButton, QTextEdit, QFileDialog, QGridLayout,
     QScrollArea
@@ -189,8 +189,25 @@ class MainWindow(QMainWindow):
             
     def display_breakdown(self):
         breakdown = prepare_breakdown(self.schedule)
-        output = export_breakdown(breakdown)
-        self.output_display.setText(output)
+        
+        # Create a table widget
+        table = QTableWidget()
+        table.setColumnCount(2)
+        table.setHorizontalHeaderLabels(["Worker", "Shifts Assigned"])
+        
+        # Populate the table with data from the breakdown
+        table.setRowCount(len(breakdown))
+        for row, (worker_id, shifts) in enumerate(breakdown.items()):
+            worker_item = QTableWidgetItem(worker_id)
+            shifts_item = QTableWidgetItem(", ".join([f"{date}: {job}" for date, job in shifts]))
+            table.setItem(row, 0, worker_item)
+            table.setItem(row, 1, shifts_item)
+        
+        # Replace the output display with the table
+        self.output_display.setParent(None)
+        self.output_display = table
+        layout = self.centralWidget().layout()
+        layout.addWidget(self.output_display)
         
 app = QApplication(sys.argv)
 window = MainWindow()
