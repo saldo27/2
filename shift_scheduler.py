@@ -208,6 +208,14 @@ def prepare_breakdown(schedule):
         for date, worker_id in shifts.items():
             breakdown[worker_id].append((date, job))
     return breakdown
+
+def export_breakdown(breakdown):
+    output = ""
+    for worker_id, shifts in breakdown.items():
+        output += f"Worker {worker_id}:\n"
+        for date, job in shifts:
+            output += f"  {date}: {job}\n"
+    return output
                       
 if __name__ == "__main__":
     # User input for the required parameters
