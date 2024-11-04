@@ -99,11 +99,8 @@ def can_work_on_date(worker, date, last_shift_date, weekend_tracker, holidays_se
             return False
 
     return True
-    
+
 def assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week):
-    # Adjust the min_distance based on the worker's percentage of shifts
-    adjusted_min_distance = max(1, int(min_distance * (worker.percentage_shifts / 100.0)))
-    
     logging.debug(f"Assigning worker {worker.identification} to job {job} on {date.strftime('%d/%m/%Y')}")
     last_shift_date[worker.identification] = date
     schedule[job][date.strftime("%d/%m/%Y")] = worker.identification
@@ -113,21 +110,6 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_date, weekend
         weekend_tracker[worker.identification] += 1
     worker.shift_quota -= 1
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
-
-def prepare_breakdown(schedule):
-    breakdown = defaultdict(list)
-    for job, shifts in schedule.items():
-        for date, worker_id in shifts.items():
-            breakdown[worker_id].append((date, job))
-    return breakdown
-
-def export_breakdown(breakdown, filename="worker_shift_breakdown.csv"):
-    with open(filename, mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(["Worker ID", "Date", "Job"])
-        for worker_id, shifts in breakdown.items():
-            for date, job in shifts:
-                writer.writerow([worker_id, date, job])
 
 def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):
     logging.debug(f"Workers: {workers}")
@@ -225,7 +207,14 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     logging.debug(f"Final schedule: {schedule}")
     return schedule
-                       
+
+def prepare_breakdown(schedule):
+    breakdown = defaultdict(list)
+    for job, shifts in schedule.items():
+        for date, worker_id in shifts.items():
+            breakdown[worker_id].append((date, job))
+    return breakdown
+                      
 if __name__ == "__main__":
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
