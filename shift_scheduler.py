@@ -68,13 +68,16 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
         return False
 
     if not override:
+        # Adjust the minimum distance for workers performing less than 100% of shifts
+        adjusted_min_distance = min_distance * 100 / worker.percentage_shifts
+
         # Check across all workstations for the current worker
         if last_shift_dates[worker.identification]:
             last_date = last_shift_dates[worker.identification][-1]
             days_diff = (date - last_date).days
             logging.debug(f"Worker {worker.identification} last worked on {last_date}, {days_diff} days ago.")
-            if days_diff < min_distance:
-                logging.debug(f"Worker {worker.identification} cannot work on {date} due to invalid interval.")
+            if days_diff < adjusted_min_distance:
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to adjusted minimum distance.")
                 return False
             if days_diff in {7, 14, 21, 28}:
                 logging.debug(f"Worker {worker.identification} cannot work on {date} due to 7, 14, 21 or 28 days constraint.")
@@ -189,7 +192,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                     assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
                     last_assigned_job[worker.identification] = job
                     last_assigned_day[worker.identification] = date.weekday()
-                    day_rotation_tracker[worker.identification][date.weekday()] = True
+                    day_rotation_tracker[w.identification][date.weekday()] = True
                     logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
                     assigned = True
 
