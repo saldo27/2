@@ -214,6 +214,14 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     return schedule
 
+def export_schedule_to_csv(schedule, file_path):
+    with open(file_path, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Job', 'Date', 'Worker'])
+        for job, shifts in schedule.items():
+            for date, worker in shifts.items():
+                writer.writerow([job, date, worker])
+
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
     for job, shifts in schedule.items():
