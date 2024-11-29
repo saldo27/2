@@ -60,7 +60,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
     else:
         logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
         return False
-
+        
     if not override:
         adjusted_min_distance = min_distance * worker.percentage_shifts / 100.0
 
@@ -98,18 +98,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
             return False
 
     return True
-        if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
-            if weekend_tracker[worker.identification] >= 4:
-                logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekend/holiday limit.")
-                return False
-
-        week_number = date.isocalendar()[1]
-        if weekly_tracker[worker.identification][week_number] >= max_shifts_per_week:
-            logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekly quota limit.")
-            return False
-
-    return True
-
+    
 def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week):
     logging.debug(f"Assigning worker {worker.identification} to job {job} on {date.strftime('%d/%m/%Y')}")
     last_shift_dates[worker.identification].append(date)
