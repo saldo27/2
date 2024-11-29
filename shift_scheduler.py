@@ -119,10 +119,10 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weeken
     if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
         weekend_tracker[worker.identification] += 1
     worker.shift_quota -= 1
-    worker.percentage_shifts -= (1 / (total_days * jobs_per_day)) * 100
+    worker.percentage_shifts -= (1 / (total_days * jobs_per_day)) * 100  # Ensure jobs_per_day is an integer
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
-
-def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):
+    
+def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):    
     logging.debug(f"Workers: {workers}")
     logging.debug(f"Work Periods: {work_periods}")
     logging.debug(f"Holidays: {holidays}")
