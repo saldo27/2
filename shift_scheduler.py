@@ -35,7 +35,7 @@ def is_holiday(date_str, holidays_set):
     else:
         return False
 
-def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=False, schedule=None, workers=None):
+def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, jobs, override=False, schedule=None, workers=None):
     if isinstance(date, str) and date:
         date = datetime.strptime(date.strip(), "%d/%m/%Y")
 
@@ -50,7 +50,6 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                         logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
                         return False
 
-    # Retrieve the last job from the jobs list
     last_job = jobs[-1] if jobs else None
 
     if job in worker.incompatible_job or (last_job and job == last_job):
@@ -190,7 +189,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 max_iterations = len(workers) * 2
 
                 while not assigned and iteration_count < max_iterations:
-                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and date_str not in [datetime.strptime(day.strip(), "%d/%m/%Y").strftime("%d/%m/%Y") for day in worker.unavailable_dates if day] and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week)]
+                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and date_str not in [datetime.strptime(day.strip(), "%d/%m/%Y").strftime("%d/%m/%Y") for day in worker.unavailable_dates if day] and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, jobs)]
                     if not available_workers:
                         logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
                         return schedule
