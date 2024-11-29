@@ -215,4 +215,7 @@ class MainWindow(QMainWindow):
         layout = self.centralWidget().layout()
         layout.addWidget(self.output_display)
         
-
+app = QApplication(sys.argv)
+window = MainWindow()
+window.show()
+app.exec()
