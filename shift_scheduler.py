@@ -52,7 +52,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
 
     last_job = jobs[-1] if jobs else None
 
-    if job in worker.incompatible_job or (last_job and job == last_job):
+    if worker.incompatible_job and (job in worker.incompatible_job or (last_job and job == last_job)):
         logging.debug(f"Worker {worker.identification} cannot work on job {job} due to job incompatibility.")
         return False
 
@@ -163,7 +163,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 date = datetime.strptime(cleaned_date_str, "%d/%m/%Y")
                 logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
                 for job in jobs:
-                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, total_days, jobs_per_day)
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, total_days, jobs)
                     last_assigned_job[worker.identification] = job
                     last_assigned_day[worker.identification] = date.weekday()
                     day_rotation_tracker[worker.identification][date.weekday()] = True
@@ -202,7 +202,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                         last_assigned_day[w.identification] != date.weekday(),
                         not day_rotation_tracker[w.identification][date.weekday()]
                     ))
-                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, total_days, jobs_per_day)
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, total_days, jobs)
                     last_assigned_job[worker.identification] = job
                     last_assigned_day[worker.identification] = date.weekday()
                     day_rotation_tracker[worker.identification][date.weekday()] = True
