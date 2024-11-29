@@ -86,7 +86,6 @@ class MainWindow(QMainWindow):
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
-
     def update_worker_inputs(self):
         num_workers = int(self.num_workers_input.text()) if self.num_workers_input.text().isdigit() else 0
         # Clear existing inputs
