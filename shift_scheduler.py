@@ -149,7 +149,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
             logging.error(f"Invalid period '{period}': {e}")
 
     total_days = sum((end_date - start_date).days + 1 for start_date, end_date in valid_work_periods)
-    jobs_per_day = len(jobs)
+    jobs_per_day = len(jobs)  # Ensure jobs_per_day is an integer
     calculate_shift_quota(workers, total_days, jobs_per_day)
 
     # Step 1: Assign obligatory coverage shifts
