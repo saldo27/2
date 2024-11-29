@@ -135,12 +135,11 @@ class MainWindow(QMainWindow):
         # Get inputs
         work_periods = self.work_periods_input.text().split(',')
         holidays = self.holidays_input.text().split(',')
-        jobs = self.jobs_input.text().split(',')  # Add this line to get jobs
-        jobs_per_day = len(jobs)  # Or use the numeric input if it defines the number of jobs per day
+        jobs_per_day = int(self.jobs_input.text())  # Use the numeric input to define the number of jobs per day
         num_workers = int(self.num_workers_input.text())
         min_distance = int(self.min_distance_input.text())
         max_shifts_per_week = int(self.max_shifts_per_week_input.text())
-        # Create workers list from user input
+       # Create workers list from user input
         workers = [
             Worker(
                 input['identification'].text(),
@@ -153,17 +152,17 @@ class MainWindow(QMainWindow):
                 [date.strip() for date in input['unavailable_dates'].text().split(',')] if input['unavailable_dates'].text() else []
             )
             for input in self.worker_inputs
-        ]
-        # Schedule shifts
-        schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, jobs_per_day)
-        # Display the schedule
-        output = ""
-        self.schedule = schedule  # Save the schedule for exporting
-        for job, shifts in schedule.items():
-            output += f"Job {job}:\n"
-            for date, worker in shifts.items():
-                output += f"  {date}: {worker}\n"
-        self.output_display.setText(output)
+    ]
+    # Schedule shifts
+    schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
+    # Display the schedule
+    output = ""
+    self.schedule = schedule  # Save the schedule for exporting
+    for date, jobs in schedule.items():
+        output += f"Date {date}:\n"
+        for job, worker in jobs.items():
+            output += f"  Job {job}: {worker}\n"
+    self.output_display.setText(output)
         
     def export_to_ical(self):
         options = QFileDialog.Options()
