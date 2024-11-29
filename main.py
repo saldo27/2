@@ -12,13 +12,10 @@ if __name__ == "__main__":
     else:
         print("QApplication instance already exists.")
 
-    window = MainWindow()
-    window.show()
-
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
     holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
-    jobs = input("Enter workstations (e.g., A, B, C, separated by commas): ").split(',')
+    jobs_per_day = int(input("Enter number of jobs per day: "))  # Add this line to get jobs_per_day
     min_distance = int(input("Enter minimum distance between work shifts (in days): "))
     max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
     num_workers = int(input("Enter number of available workers: "))
@@ -37,6 +34,10 @@ if __name__ == "__main__":
         ) for i in range(num_workers)
     ]
 
+    window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
+    window.show()
+
+    sys.exit(app.exec())
     # Schedule shifts
     schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
     breakdown = prepare_breakdown(schedule)
