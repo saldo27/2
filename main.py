@@ -13,11 +13,11 @@ if __name__ == "__main__":
         print("QApplication instance already exists.")
 
     # User input for the required parameters
-    work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
-    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
-    jobs_per_day = int(input("Enter number of jobs per day: "))
-    min_distance = int(input("Enter minimum distance between work shifts (in days): "))
-    max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
+    work_periods = input("Periodos de trabajo (separados por comas, e.g., '01/10/2024-10/10/2024): ").split(',')
+    holidays = input("Festivos (separados por comas, e.g., '05/10/2024): ").split(',')
+    jobs_per_day = int(input("Puestos de guardia: "))
+    min_distance = int(input("Distancia mínima entre guardias: "))
+    max_shifts_per_week = int(input("Número máximo de guardias/semana: "))
     num_workers = int(input("Enter number of available workers: "))
 
     # Create workers list from user input
