@@ -30,9 +30,9 @@ class PDFCalendar(FPDF):
                     date_str = datetime(year, month, day).strftime("%d/%m/%Y")
                     shifts = [worker for job, dates in schedule.items() for d, worker in dates.items() if d == date_str]
                     day_number = f"{day}"
-                    workers = "\n".join(shifts)
+                    workers = ", ".join(shifts)
                     cell_content = f"{day_number}\n{workers}"
-                    self.cell(25, 20, cell_content, 1, 0, 'C')
+                    self.multi_cell(25, 10, cell_content, 1, 'C')  # Use multi_cell for multiline content
 
             self.ln()
 
