@@ -178,7 +178,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 max_iterations = len(workers) * 2
 
                 while not assigned and iteration_count < max_iterations:
-                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week)]
+                    available_workers = [worker for worker in workers if worker.shift_quota > 0 and date_str not in [datetime.strptime(day.strip(), "%d/%m/%Y").strftime("%d/%m/%Y") for day in worker.unavailable_dates if day] and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week)]
                     if not available_workers:
                         logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
                         return schedule
