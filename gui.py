@@ -23,6 +23,15 @@ class MainWindow(QMainWindow):
         self.max_shifts_per_week = max_shifts_per_week
         self.jobs_per_day = jobs_per_day
         self.worker_inputs = []
+
+        # Create input widgets
+        self.work_periods_input = QLineEdit(','.join(work_periods))
+        self.holidays_input = QLineEdit(','.join(holidays))
+        self.jobs_per_day_input = QLineEdit(str(jobs_per_day))
+        self.min_distance_input = QLineEdit(str(min_distance))
+        self.max_shifts_per_week_input = QLineEdit(str(max_shifts_per_week))
+        self.num_workers_input = QLineEdit(str(len(workers)))
+
         self.output_display = QTextEdit()
         self.output_display.setReadOnly(True)
         self.schedule_button = QPushButton("Reparte las guardias")
@@ -30,12 +39,14 @@ class MainWindow(QMainWindow):
         self.export_pdf_button = QPushButton("Exportar a PDF")
         self.export_csv_button = QPushButton("Exportar a CSV")
         self.breakdown_button = QPushButton("Desglose por médico")
+
         # Connect buttons to functions
         self.schedule_button.clicked.connect(self.schedule_shifts)
         self.export_ical_button.clicked.connect(self.export_to_ical)
         self.export_pdf_button.clicked.connect(self.export_to_pdf)
         self.export_csv_button.clicked.connect(self.export_to_csv)
         self.breakdown_button.clicked.connect(self.display_breakdown)
+
         # Setup layout
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Periodos de trabajo (separados por comas, e.g., '01/10/2024-10/10/2024'):"))
@@ -63,6 +74,19 @@ class MainWindow(QMainWindow):
         self.scroll_area.setWidget(self.scroll_area_widget)
 
         layout.addWidget(self.scroll_area)
+        
+        self.num_workers_input.textChanged.connect(self.update_worker_inputs)
+        
+        layout.addWidget(self.schedule_button)
+        layout.addWidget(self.export_ical_button)
+        layout.addWidget(self.export_pdf_button)
+        layout.addWidget(self.export_csv_button)
+        layout.addWidget(QLabel("Reparto:"))
+        layout.addWidget(self.output_display)
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+  
         
         self.num_workers_input.textChanged.connect(self.update_worker_inputs)
         
