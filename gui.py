@@ -221,14 +221,6 @@ class MainWindow(QMainWindow):
         
 app = QApplication(sys.argv)
 
-# Provide the required arguments here
-work_periods = ['01/10/2024-10/10/2024']
-holidays = ['05/10/2024']
-workers = []  # Populate with actual Worker instances if needed
-min_distance = 2
-max_shifts_per_week = 5
-jobs_per_day = 3
-
 window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
 window.show()
 sys.exit(app.exec())
