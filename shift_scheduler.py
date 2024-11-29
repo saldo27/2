@@ -121,17 +121,18 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weeken
     worker.shift_quota -= 1
     worker.percentage_shifts -= (1 / (total_days * jobs_per_day)) * 100  # Ensure jobs_per_day is an integer
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
-    
-def schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day):
+
+def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, jobs_per_day):
     logging.debug(f"Workers: {workers}")
     logging.debug(f"Work Periods: {work_periods}")
     logging.debug(f"Holidays: {holidays}")
+    logging.debug(f"Jobs: {jobs}")  # Add this line to log jobs
 
-    schedule = {}
+    schedule = {job: {} for job in jobs}
     holidays_set = set(holidays)
     weekend_tracker = {worker.identification: 0 for worker in workers}
     last_shift_dates = {worker.identification: [] for worker in workers}
-    job_count = {worker.identification: {job: 0 for job in range(jobs_per_day)} for worker in workers}
+    job_count = {worker.identification: {job: 0 for job in jobs} for worker in workers}
     weekly_tracker = defaultdict(lambda: defaultdict(int))
     last_assigned_job = {worker.identification: None for worker in workers}
     last_assigned_day = {worker.identification: None for worker in workers}
