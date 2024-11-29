@@ -71,6 +71,9 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
             if days_diff < adjusted_min_distance:
                 logging.debug(f"Worker {worker.identification} cannot work on {date} due to adjusted minimum distance from previous shift.")
                 return False
+            if days_diff in {7, 14, 21, 28}:
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to 7, 14, 21 or 28 days constraint.")
+                return False
             if last_date.date() == date.date():
                 logging.debug(f"Worker {worker.identification} cannot work on {date} because they already have a shift on this day.")
 
@@ -80,7 +83,21 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
             if next_days_diff > 0 and next_days_diff < adjusted_min_distance:
                 logging.debug(f"Worker {worker.identification} cannot work on {date} due to adjusted minimum distance to next shift on {next_shift_date}.")
                 return False
+            if next_days_diff in {7, 14, 21, 28}:
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to 7, 14, 21 or 28 days constraint with next shift on {next_shift_date}.")
+                return False
 
+        if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
+            if weekend_tracker[worker.identification] >= 4:
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekend/holiday limit.")
+                return False
+
+        week_number = date.isocalendar()[1]
+        if weekly_tracker[worker.identification][week_number] >= max_shifts_per_week:
+            logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekly quota limit.")
+            return False
+
+    return True
         if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
             if weekend_tracker[worker.identification] >= 4:
                 logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekend/holiday limit.")
