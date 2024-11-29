@@ -28,12 +28,12 @@ class Worker:
         return (self.shift_quota, self.identification) == (other.shift_quota, other.identification)
 
 @staticmethod
-def from_user_input(identification, working_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates):
-    working_dates = [(datetime.strptime(start.strip(), "%d/%m/%Y"), datetime.strptime(end.strip(), "%d/%m/%Y")) 
-                     for date in working_dates.split(',') if '-' in date 
+def from_user_input(identification, work_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates):
+    work_dates = [(datetime.strptime(start.strip(), "%d/%m/%Y"), datetime.strptime(end.strip(), "%d/%m/%Y")) 
+                     for date in work_dates.split(',') if '-' in date 
                      for start, end in [date.split('-')]]
     position_incompatibility = position_incompatibility.split(',') if position_incompatibility else []
     group_incompatibility = group_incompatibility.split(',') if group_incompatibility else []
     obligatory_coverage = [datetime.strptime(date.strip(), "%d/%m/%Y") for date in obligatory_coverage.split(',') if date]
     unavailable_dates = [datetime.strptime(date.strip(), "%d/%m/%Y") for date in unavailable_dates.split(',') if date]
-    return Worker(identification, working_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates)
+    return Worker(identification, work_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates)
