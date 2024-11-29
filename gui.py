@@ -14,17 +14,14 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day):
         super().__init__()
-        self.setWindowTitle("Distribuidor de Guardias")
-        # Initialize widgets
-        self.work_periods_input = QLineEdit()
-        self.holidays_input = QLineEdit()
-        self.jobs_input = QLineEdit()
-        self.num_workers_input = QLineEdit()
-        self.min_distance_input = QLineEdit()
-        self.max_shifts_per_week_input = QLineEdit()
-        self.previous_shifts_input = QLineEdit()
+        self.work_periods = work_periods
+        self.holidays = holidays
+        self.workers = workers
+        self.min_distance = min_distance
+        self.max_shifts_per_week = max_shifts_per_week
+        self.jobs_per_day = jobs_per_day
         self.worker_inputs = []
         self.output_display = QTextEdit()
         self.output_display.setReadOnly(True)
