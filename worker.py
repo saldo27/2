@@ -37,5 +37,4 @@ def from_user_input(identification, working_dates, percentage_shifts, group, gro
     group_incompatibility = group_incompatibility.split(',') if group_incompatibility else []
     obligatory_coverage = [datetime.strptime(date.strip(), "%d/%m/%Y") for date in obligatory_coverage.split(',') if date]
     unavailable_dates = [datetime.strptime(date.strip(), "%d/%m/%Y") for date in unavailable_dates.split(',') if date]
-    return Worker(identification, working_dates, percentage_shifts, group, position_incompatibility,
-                  group_incompatibility, obligatory_coverage, unavailable_dates)
+    return Worker(identification, working_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates)
