@@ -29,8 +29,7 @@ class Worker:
         return (self.shift_quota, self.identification) == (other.shift_quota, other.identification)
 
 @staticmethod
-def from_user_input(identification, working_dates, percentage_shifts, group, position_incompatibility,
-                    group_incompatibility, obligatory_coverage, unavailable_dates):
+def from_user_input(identification, working_dates, percentage_shifts, group, group_incompatibility, obligatory_coverage, unavailable_dates):
     working_dates = [(datetime.strptime(start.strip(), "%d/%m/%Y"), datetime.strptime(end.strip(), "%d/%m/%Y")) 
                      for date in working_dates.split(',') if '-' in date 
                      for start, end in [date.split('-')]]
