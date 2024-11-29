@@ -12,8 +12,7 @@ class PDFCalendar(FPDF):
         self.cell(0, 10, f'{calendar.month_name[month]} {year}', 0, 1, 'C')
         self.ln(10)
 
-        # Create a table for the calendar
-        self.set_font('Arial', 'B', 8)  # Set font size to 7
+        self.set_font('Arial', 'B', 8)
         days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         for day in days:
             self.cell(25, 10, day, 1, 0, 'C')
@@ -21,22 +20,21 @@ class PDFCalendar(FPDF):
 
         cal = calendar.Calendar(firstweekday=0)
         month_days = cal.monthdayscalendar(year, month)
-        self.set_font('Arial', '', 8)  # Set font size to 7
+        self.set_font('Arial', '', 8)
 
         for week in month_days:
             for day in week:
                 if day == 0:
-                    self.cell(25, 20, '', 1, 0, 'C')  # Adjusted height for content
+                    self.cell(25, 20, '', 1, 0, 'C')
                 else:
                     date_str = datetime(year, month, day).strftime("%d/%m/%Y")
                     shifts = [worker for job, dates in schedule.items() for d, worker in dates.items() if d == date_str]
-                    cell_content = ", ".join(shifts)  # Insert commas between values
-                    self.cell(25, 20, cell_content, 1, 0, 'C')  # Adjusted height for content
+                    cell_content = f"{day}\n" + ", ".join(shifts)  # Add day number above the workers
+                    self.cell(25, 20, cell_content, 1, 0, 'C')
 
             self.ln()
 
-            # Check if the next row will fit on the page, if not, add a new page
-            if self.get_y() + 20 > self.page_break_trigger:  # Adjusted height for content
+            if self.get_y() + 20 > self.page_break_trigger:
                 self.add_page()
                 self.set_y(self.t_margin)
                 self.set_font('Arial', 'B', 8)
