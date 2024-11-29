@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         # Create input widgets
         self.work_periods_input = QLineEdit(','.join(work_periods))
         self.holidays_input = QLineEdit(','.join(holidays))
-        self.jobs_input = QLineEdit(str(jobs_per_day))  # Initialize jobs_input
+        self.jobs_input = QLineEdit(str(jobs_per_day))
         self.min_distance_input = QLineEdit(str(min_distance))
         self.max_shifts_per_week_input = QLineEdit(str(max_shifts_per_week))
         self.num_workers_input = QLineEdit(str(len(workers)))
