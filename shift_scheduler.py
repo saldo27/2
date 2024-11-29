@@ -5,12 +5,11 @@ from collections import defaultdict
 import csv
 
 class Worker:
-    def __init__(self, identification, work_dates=None, percentage=100.0, group='1', incompatible_job=None, group_incompatibility=None, obligatory_coverage=None, unavailable_dates=None):
+    def __init__(self, identification, work_dates=None, percentage=100.0, group='1', group_incompatibility=None, obligatory_coverage=None, unavailable_dates=None):
         self.identification = identification
         self.work_dates = work_dates if work_dates else []
         self.percentage_shifts = float(percentage) if percentage else 100.0
         self.group = group if group else '1'
-        self.incompatible_job = incompatible_job if incompatible_job else []
         self.group_incompatibility = group_incompatibility if group_incompatibility else []
         self.obligatory_coverage = obligatory_coverage if obligatory_coverage else []
         self.unavailable_dates = unavailable_dates if unavailable_dates else []
@@ -48,11 +47,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                     if any(group == assigned_worker.group for group in worker.group_incompatibility):
                         logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
                         return False
-    
-    if worker.incompatible_job and (job in worker.incompatible_job or (last_job and job == last_job)):
-        logging.debug(f"Worker {worker.identification} cannot work on job {job} due to job incompatibility.")
-        return False
-
+  
     if date in [datetime.strptime(day.strip(), "%d/%m/%Y") for day in worker.unavailable_dates if day]:
         logging.debug(f"Worker {worker.identification} cannot work on {date} due to unavailability.")
         return False
@@ -235,7 +230,7 @@ def export_breakdown(breakdown):
 if __name__ == "__main__":
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
     holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
-    jobs_per_day = input("Enter workstations (e.g., A, B, C, separated by commas): ").split(',')
+    jobs_per_day = input("Enter jobs per day: ").split(',')
     min_distance = int(input("Enter minimum distance between work shifts (in days): "))
     max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
     num_workers = int(input("Enter number of available workers: "))
