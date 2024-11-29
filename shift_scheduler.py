@@ -91,8 +91,14 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                 return False
 
         if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
-            if weekend_tracker[worker.identification] >= 4:
-                logging.debug(f"Worker {worker.identification} cannot work on {date} due to weekend/holiday limit.")
+            consecutive_weekends = 0
+            for past_date in reversed(last_shift_dates[worker.identification]):
+                if is_weekend(past_date) or is_holiday(past_date.strftime("%d/%m/%Y"), holidays_set):
+                    consecutive_weekends += 1
+                else:
+                    break
+            if consecutive_weekends >= 3:
+                logging.debug(f"Worker {worker.identification} cannot work on {date} due to exceeding 3 consecutive weekend/holiday shifts.")
                 return False
 
         week_number = date.isocalendar()[1]
