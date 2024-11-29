@@ -119,6 +119,8 @@ def schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_pe
     logging.debug(f"Work Periods: {work_periods}")
     logging.debug(f"Holidays: {holidays}")
 
+    jobs = [f"Job{i+1}" for i in range(jobs_per_day)]  
+    
     schedule = defaultdict(dict)
     holidays_set = set(holidays)
     weekend_tracker = {worker.identification: 0 for worker in workers}
