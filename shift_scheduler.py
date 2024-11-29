@@ -139,68 +139,72 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     total_days = sum((end_date - start_date).days + 1 for start_date, end_date in valid_work_periods)
     jobs_per_day = len(jobs)
     calculate_shift_quota(workers, total_days, jobs_per_day)
-# Step 1: Assign obligatory coverage shifts
-for worker in workers:
-    if not worker.work_dates:
-        worker.work_dates = valid_work_periods
 
-    for date_str in worker.obligatory_coverage:
-        cleaned_date_str = date_str.strip().replace('.', '')
-        if cleaned_date_str:
-            date = datetime.strptime(cleaned_date_str, "%d/%m/%Y")
-            logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
+    # Step 1: Assign obligatory coverage shifts
+    for worker in workers:
+        if not worker.work_dates:
+            worker.work_dates = valid_work_periods
+
+        for date_str in worker.obligatory_coverage:
+            cleaned_date_str = date_str.strip().replace('.', '')
+            if cleaned_date_str:
+                date = datetime.strptime(cleaned_date_str, "%d/%m/%Y")
+                logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
+                for job in jobs:
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                    last_assigned_job[worker.identification] = job
+                    last_assigned_day[worker.identification] = date.weekday()
+                    day_rotation_tracker[worker.identification][date.weekday()] = True
+                    logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
+                    break
+                else:
+                    logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
+                    continue
+
+    # Step 2: Assign remaining shifts respecting all premises
+    for start_date, end_date in valid_work_periods:
+        for date in generate_date_range(start_date, end_date):
+            date_str = date.strftime("%d/%m/%Y")
             for job in jobs:
-                assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
-                last_assigned_job[worker.identification] = job
-                last_assigned_day[worker.identification] = date.weekday()
-                day_rotation_tracker[worker.identification][date.weekday()] = True
-                logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
-                break
-            else:
-                logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
-                continue
-# Step 2: Assign remaining shifts respecting all premises
-for start_date, end_date in valid_work_periods:
-    for date in generate_date_range(start_date, end_date):
-        date_str = date.strftime("%d/%m/%Y")
-        for job in jobs:
-            # Skip if the job is already assigned on this date
-            if date_str in schedule[job]:
-                continue
+                # Skip if the job is already assigned on this date
+                if date_str in schedule[job]:
+                    continue
 
-            logging.debug(f"Processing job '{job}' on date {date_str}")
+                logging.debug(f"Processing job '{job}' on date {date_str}")
 
-            assigned = False
-            iteration_count = 0
-            max_iterations = len(workers) * 2
+                assigned = False
+                iteration_count = 0
+                max_iterations = len(workers) * 2
 
-            while not assigned and iteration_count < max_iterations:
-                available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers)]
-                if not available_workers:
+                while not assigned and iteration_count < max_iterations:
                     available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers)]
                     if not available_workers:
-                        logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
+                        available_workers = [worker for worker in workers if worker.shift_quota > 0 and can_work_on_date(worker, date_str, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers)]
+                        if not available_workers:
+                            logging.error(f"No available workers for job {job} on {date_str}. Stopping assignment.")
+                            return schedule
+
+                    worker = max(available_workers, key=lambda w: (
+                        (date - last_shift_dates[w.identification][-1]).days if last_shift_dates[w.identification] else float('inf'),
+                        w.shift_quota,
+                        w.percentage_shifts,
+                        last_assigned_job[w.identification] != job,
+                        last_assigned_day[w.identification] != date.weekday(),
+                        not day_rotation_tracker[w.identification][date.weekday()]
+                    ))
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                    last_assigned_job[worker.identification] = job
+                    last_assigned_day[worker.identification] = date.weekday()
+                    day_rotation_tracker[worker.identification][date.weekday()] = True
+                    logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
+                    assigned = True
+
+                    iteration_count += 1
+                    if iteration_count >= max_iterations:
+                        logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
                         return schedule
 
-                worker = max(available_workers, key=lambda w: (
-                    (date - last_shift_dates[w.identification][-1]).days if last_shift_dates[w.identification] else float('inf'),
-                    w.shift_quota,
-                    w.percentage_shifts,
-                    last_assigned_job[w.identification] != job,
-                    last_assigned_day[w.identification] != date.weekday(),
-                    not day_rotation_tracker[w.identification][date.weekday()]
-                ))
-                assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
-                last_assigned_job[worker.identification] = job
-                last_assigned_day[worker.identification] = date.weekday()
-                day_rotation_tracker[worker.identification][date.weekday()] = True
-                logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
-                assigned = True
-
-                iteration_count += 1
-                if iteration_count >= max_iterations:
-                    logging.error(f"Exceeded maximum iterations for job {job} on {date_str}. Exiting to prevent infinite loop.")
-                    return schedule
+    return schedule
 
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
