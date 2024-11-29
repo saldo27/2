@@ -215,7 +215,4 @@ class MainWindow(QMainWindow):
         layout = self.centralWidget().layout()
         layout.addWidget(self.output_display)
         
-app = QApplication(sys.argv)
-window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
-window.show()
-sys.exit(app.exec())
+
