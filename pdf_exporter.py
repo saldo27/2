@@ -24,6 +24,7 @@ class PDFCalendar(FPDF):
 
         for week in month_days:
             for day in week:
+                x, y = self.get_x(), self.get_y()
                 if day == 0:
                     self.cell(25, 20, '', 1, 0, 'C')
                 else:
@@ -32,9 +33,8 @@ class PDFCalendar(FPDF):
                     day_number = f"{day}"
                     workers = ", ".join(shifts)
                     cell_content = f"{day_number}\n{workers}"
-                    x, y = self.get_x(), self.get_y()
                     self.multi_cell(25, 10, cell_content, 1, 'C')
-                    self.set_xy(x + 25, y)  # Move to the next cell position
+                self.set_xy(x + 25, y)  # Move to the next cell position
 
             self.ln()
 
