@@ -14,7 +14,6 @@ class Worker:
         self.group_incompatibility = group_incompatibility if group_incompatibility else []
         self.obligatory_coverage = obligatory_coverage if obligatory_coverage else []
         self.unavailable_dates = unavailable_dates if unavailable_dates else []
-
 def calculate_shift_quota(workers, total_days, jobs_per_day):
     total_percentage = sum(worker.percentage_shifts for worker in workers)
     total_shifts = total_days * jobs_per_day
@@ -49,9 +48,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                     if any(group == assigned_worker.group for group in worker.group_incompatibility):
                         logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
                         return False
-
-    last_job = jobs[-1] if jobs else None
-
+    
     if worker.incompatible_job and (job in worker.incompatible_job or (last_job and job == last_job)):
         logging.debug(f"Worker {worker.identification} cannot work on job {job} due to job incompatibility.")
         return False
