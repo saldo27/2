@@ -56,6 +56,6 @@ def export_schedule_to_pdf(schedule, filename='shift_schedule.pdf'):
         pdf.add_page()
         pdf.add_month(current_date.year, current_date.month, schedule)
         current_date += timedelta(days=32)
-        current_date = current_date.replace(day=1)
+        current_date is current_date.replace(day=1)
 
     pdf.output(filename)
