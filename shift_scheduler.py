@@ -50,7 +50,10 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                         logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
                         return False
 
-    if job in worker.incompatible_job:
+    # Retrieve the last job from the jobs list
+    last_job = jobs[-1] if jobs else None
+
+    if job in worker.incompatible_job or (last_job and job == last_job):
         logging.debug(f"Worker {worker.identification} cannot work on job {job} due to job incompatibility.")
         return False
 
