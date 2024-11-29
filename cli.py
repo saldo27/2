@@ -2,6 +2,29 @@ from worker import Worker
 from shift_scheduler import schedule_shifts
 from datetime import datetime
 
+if __name__ == "__main__":
+    # User input for the required parameters
+    work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
+    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
+    jobs_per_day = int(input("Enter number of jobs per day: "))
+    min_distance = int(input("Enter minimum distance between work shifts (in days): "))
+    max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
+    num_workers = int(input("Enter number of available workers: "))
+
+    # Create workers list from user input
+    workers = [
+        Worker(
+            identification=f"W{i+1}",
+            work_dates=["01/10/2024-10/10/2024", "20/10/2024-31/10/2024"],  # Example dates
+            percentage=100.0,
+            group='1',
+            group_incompatibility=[],
+            obligatory_coverage=[],
+            unavailable_dates=[]
+        )
+        for i in range(num_workers)
+    ]
+
 def run_cli():
     print("Enter work periods (comma-separated, e.g., '01/10/2024-10/10/2024'): ")
     work_periods_input = input().split(',')
