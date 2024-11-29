@@ -122,17 +122,16 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weeken
     worker.percentage_shifts -= (1 / (total_days * jobs_per_day)) * 100  # Ensure jobs_per_day is an integer
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
     
-def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):    
+def schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day):
     logging.debug(f"Workers: {workers}")
     logging.debug(f"Work Periods: {work_periods}")
     logging.debug(f"Holidays: {holidays}")
-    logging.debug(f"Jobs: {jobs}")
 
-    schedule = {job: {} for job in jobs}
+    schedule = {}
     holidays_set = set(holidays)
     weekend_tracker = {worker.identification: 0 for worker in workers}
     last_shift_dates = {worker.identification: [] for worker in workers}
-    job_count = {worker.identification: {job: 0 for job in jobs} for worker in workers}
+    job_count = {worker.identification: {job: 0 for job in range(jobs_per_day)} for worker in workers}
     weekly_tracker = defaultdict(lambda: defaultdict(int))
     last_assigned_job = {worker.identification: None for worker in workers}
     last_assigned_day = {worker.identification: None for worker in workers}
@@ -149,7 +148,6 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
             logging.error(f"Invalid period '{period}': {e}")
 
     total_days = sum((end_date - start_date).days + 1 for start_date, end_date in valid_work_periods)
-    jobs_per_day = len(jobs)  # Ensure jobs_per_day is an integer
     calculate_shift_quota(workers, total_days, jobs_per_day)
 
     # Step 1: Assign obligatory coverage shifts
