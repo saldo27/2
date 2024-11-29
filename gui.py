@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         # Create input widgets
         self.work_periods_input = QLineEdit(','.join(work_periods))
         self.holidays_input = QLineEdit(','.join(holidays))
-        self.jobs_per_day_input = QLineEdit(str(jobs_per_day))  # Define jobs_input here
+        self.jobs_input = QLineEdit(str(jobs_per_day))  # Initialize jobs_input
         self.min_distance_input = QLineEdit(str(min_distance))
         self.max_shifts_per_week_input = QLineEdit(str(max_shifts_per_week))
         self.num_workers_input = QLineEdit(str(len(workers)))
@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(QLabel("Festivos (separados por comas, e.g., '05/10/2024'):"))
         layout.addWidget(self.holidays_input)
         layout.addWidget(QLabel("Puestos de guardia:"))
-        layout.addWidget(self.jobs_per_day_input)
+        layout.addWidget(self.jobs_input)  # Add jobs_input to the layout
         layout.addWidget(QLabel("Distancia mínima entre guardias:"))
         layout.addWidget(self.min_distance_input)
         layout.addWidget(QLabel("Número máximo de guardias/semana:"))
@@ -74,18 +74,6 @@ class MainWindow(QMainWindow):
         self.scroll_area.setWidget(self.scroll_area_widget)
 
         layout.addWidget(self.scroll_area)
-        
-        self.num_workers_input.textChanged.connect(self.update_worker_inputs)
-        
-        layout.addWidget(self.schedule_button)
-        layout.addWidget(self.export_ical_button)
-        layout.addWidget(self.export_pdf_button)
-        layout.addWidget(self.export_csv_button)
-        layout.addWidget(QLabel("Reparto:"))
-        layout.addWidget(self.output_display)
-        container = QWidget()
-        container.setLayout(layout)
-        self.setCentralWidget(container)
         
         self.num_workers_input.textChanged.connect(self.update_worker_inputs)
         
