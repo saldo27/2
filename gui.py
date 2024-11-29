@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
         # Get inputs
         work_periods = self.work_periods_input.text().split(',')
         holidays = self.holidays_input.text().split(',')
-        jobs = self.jobs_input.text().split(',')
+        jobs_per_day = int(self.jobs_input.text())  # Convert jobs_input to an integer
         num_workers = int(self.num_workers_input.text())
         min_distance = int(self.min_distance_input.text())
         max_shifts_per_week = int(self.max_shifts_per_week_input.text())
@@ -154,7 +154,7 @@ class MainWindow(QMainWindow):
             for input in self.worker_inputs
         ]
         # Schedule shifts
-        schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
+        schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
         # Display the schedule
         output = ""
         self.schedule = schedule  # Save the schedule for exporting
@@ -163,7 +163,6 @@ class MainWindow(QMainWindow):
             for date, worker in shifts.items():
                 output += f"  {date}: {worker}\n"
         self.output_display.setText(output)
-
     def export_to_ical(self):
         options = QFileDialog.Options()
         filePath, _ = QFileDialog.getSaveFileName(self, "Save Schedule as iCalendar", "", "iCalendar Files (*.ics);;All Files (*)", options=options)
