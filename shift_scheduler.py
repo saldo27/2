@@ -162,6 +162,10 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
         for date in generate_date_range(start_date, end_date):
             date_str = date.strftime("%d/%m/%Y")
             for job in jobs:
+                # Skip if the job is already assigned on this date
+                if date_str in schedule[job]:
+                    continue
+
                 logging.debug(f"Processing job '{job}' on date {date_str}")
 
                 assigned = False
