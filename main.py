@@ -13,11 +13,11 @@ if __name__ == "__main__":
         print("QApplication instance already exists.")
 
     # User input for the required parameters
-    work_periods = input("Periodos de trabajo (separados por comas, e.g., '01/10/2024-10/10/2024): ").split(',')
-    holidays = input("Festivos (separados por comas, e.g., '05/10/2024): ").split(',')
-    jobs_per_day = int(input("Puestos de guardia: "))
-    min_distance = int(input("Distancia mínima entre guardias: "))
-    max_shifts_per_week = int(input("Número máximo de guardias/semana: "))
+    work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
+    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
+    jobs_per_day = int(input("Enter number of jobs per day: "))
+    min_distance = int(input("Enter minimum distance between work shifts (in days): "))
+    max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
     num_workers = int(input("Enter number of available workers: "))
 
     # Create workers list from user input
@@ -28,16 +28,14 @@ if __name__ == "__main__":
             percentage=100.0,
             group='1',
             group_incompatibility=[],
-            obligatory_coverage=[],
+            obligatory_coverage=[]
             unavailable_dates=[]
         )
         for i in range(num_workers)
     ]
 
-    # Now pass this workers list to the schedule_shifts function
     schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
     
-    # Further processing...
     app = QApplication(sys.argv)
     window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
     window.show()
