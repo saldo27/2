@@ -28,7 +28,7 @@ if __name__ == "__main__":
             percentage=100.0,
             group='1',
             group_incompatibility=[],
-            obligatory_coverage=[]
+            obligatory_coverage=[],
             unavailable_dates=[]
         )
         for i in range(num_workers)
