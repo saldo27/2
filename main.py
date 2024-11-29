@@ -33,6 +33,7 @@ if __name__ == "__main__":
         )
         for i in range(num_workers)
     ]
+schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
 
 app = QApplication(sys.argv)
 window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
