@@ -24,7 +24,7 @@ if __name__ == "__main__":
     workers = [
         Worker(
             identification=f"W{i+1}",
-            work_dates=["01/10/2024-10/10/2024", "20/10/2024-31/10/2024"],  # Example dates
+            working_dates=["01/10/2024-10/10/2024", "20/10/2024-31/10/2024"],  # Example dates
             percentage=100.0,
             group='1',
             group_incompatibility=[],
