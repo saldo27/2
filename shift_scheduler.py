@@ -146,7 +146,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
             worker.work_dates = valid_work_periods
 
         for date_str in worker.obligatory_coverage:
-            cleaned_date_str = date_str.strip().replace('.', '')
+            cleaned_date_str = date_str.strip().replace('.', '').replace(' ', '')
             if cleaned_date_str:
                 date = datetime.strptime(cleaned_date_str, "%d/%m/%Y")
                 logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
