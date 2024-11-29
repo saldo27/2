@@ -86,7 +86,6 @@ class MainWindow(QMainWindow):
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
-  
         
         self.num_workers_input.textChanged.connect(self.update_worker_inputs)
         
