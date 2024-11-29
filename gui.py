@@ -151,15 +151,15 @@ class MainWindow(QMainWindow):
             for input in self.worker_inputs
     ]
     # Schedule shifts
-    schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
+    schedule = schedule_shifts(self.work_periods, self.holidays, self.workers, self.min_distance, self.max_shifts_per_week, self.jobs_per_day)
     # Display the schedule
-    output = ""
-    self.schedule = schedule  # Save the schedule for exporting
-    for date, jobs in schedule.items():
-        output += f"Date {date}:\n"
-        for job, worker in jobs.items():
-            output += f"  Job {job}: {worker}\n"
-    self.output_display.setText(output)
+        output = ""
+        self.schedule = schedule  # Save the schedule for exporting
+        for date, jobs in schedule.items():
+            output += f"Date {date}:\n"
+            for job, worker in jobs.items():
+                output += f"  Job {job}: {worker}\n"
+        self.output_display.setText(output)
         
     def export_to_ical(self):
         options = QFileDialog.Options()
