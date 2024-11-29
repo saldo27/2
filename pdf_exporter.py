@@ -32,7 +32,9 @@ class PDFCalendar(FPDF):
                     day_number = f"{day}"
                     workers = ", ".join(shifts)
                     cell_content = f"{day_number}\n{workers}"
-                    self.multi_cell(25, 10, cell_content, 1, 'C')  # Use multi_cell for multiline content
+                    x, y = self.get_x(), self.get_y()
+                    self.multi_cell(25, 10, cell_content, 1, 'C')
+                    self.set_xy(x + 25, y)  # Move to the next cell position
 
             self.ln()
 
