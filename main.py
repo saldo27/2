@@ -20,6 +20,8 @@ if __name__ == "__main__":
     max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
     num_workers = int(input("Enter number of available workers: "))
 
+schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
+
     # Create workers list from user input
     workers = [
         Worker(
@@ -33,7 +35,6 @@ if __name__ == "__main__":
         )
         for i in range(num_workers)
     ]
-schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
 
 app = QApplication(sys.argv)
 window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
