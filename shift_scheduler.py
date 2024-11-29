@@ -50,6 +50,10 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
                         logging.debug(f"Worker {worker.identification} cannot work on {date} due to group incompatibility with worker {assigned_worker.identification}.")
                         return False
 
+    if job in worker.incompatible_job:
+        logging.debug(f"Worker {worker.identification} cannot work on job {job} due to job incompatibility.")
+        return False
+
     if date in [datetime.strptime(day.strip(), "%d/%m/%Y") for day in worker.unavailable_dates if day]:
         logging.debug(f"Worker {worker.identification} cannot work on {date} due to unavailability.")
         return False
@@ -60,7 +64,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
     else:
         logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
         return False
-        
+
     if not override:
         adjusted_min_distance = min_distance * worker.percentage_shifts / 100.0
 
@@ -77,7 +81,6 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
             if last_date.date() == date.date():
                 logging.debug(f"Worker {worker.identification} cannot work on {date} because they already have a shift on this day.")
 
-        # Check the minimum distance to the next shift
         for next_shift_date in last_shift_dates[worker.identification]:
             next_days_diff = (next_shift_date - date).days
             if next_days_diff > 0 and next_days_diff < adjusted_min_distance:
