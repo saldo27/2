@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.work_periods_input)
         layout.addWidget(QLabel("Festivos (separados por comas, e.g., '05/10/2024'):"))
         layout.addWidget(self.holidays_input)
-        layout.addWidget(QLabel("Puestos de guardia (separados por comas, e.g., 'A,B,C'):"))
+        layout.addWidget(QLabel("Puestos de guardia:"))
         layout.addWidget(self.jobs_input)
         layout.addWidget(QLabel("Distancia mínima entre guardias:"))
         layout.addWidget(self.min_distance_input)
