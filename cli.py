@@ -10,8 +10,8 @@ def run_cli():
     print("Enter festivos (comma-separated, e.g., '05/10/2024'): ")
     holidays = input().split(',')
 
-    print("Enter workstations (comma-separated, e.g., 'A,B,C'): ")
-    jobs = input().split(',')
+    print("Enter number of jobs per day: ")
+    jobs_per_day = int(input())
 
     print("Enter minimum distance between work shifts (in days): ")
     min_distance = int(input())
@@ -26,7 +26,7 @@ def run_cli():
     for _ in range(num_workers):
         workers.append(Worker.from_user_input())
 
-    schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
+    schedule = schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
     
     print("Shifts scheduled successfully.")
     for job, shifts in schedule.items():
