@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         num_workers = int(self.num_workers_input.text())
         min_distance = int(self.min_distance_input.text())
         max_shifts_per_week = int(self.max_shifts_per_week_input.text())
-       # Create workers list from user input
+        # Create workers list from user input
         workers = [
             Worker(
                 input['identification'].text(),
@@ -149,10 +149,10 @@ class MainWindow(QMainWindow):
                 [date.strip() for date in input['unavailable_dates'].text().split(',')] if input['unavailable_dates'].text() else []
             )
             for input in self.worker_inputs
-    ]
-    # Schedule shifts
-    schedule = schedule_shifts(self.work_periods, self.holidays, self.workers, self.min_distance, self.max_shifts_per_week, self.jobs_per_day)
-    # Display the schedule
+        ]
+        # Schedule shifts
+        schedule = schedule_shifts(self.work_periods, self.holidays, self.workers, self.min_distance, self.max_shifts_per_week, self.jobs_per_day)
+        # Display the schedule
         output = ""
         self.schedule = schedule  # Save the schedule for exporting
         for date, jobs in schedule.items():
@@ -216,6 +216,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.output_display)
         
 app = QApplication(sys.argv)
-window = MainWindow()
+window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
 window.show()
 sys.exit(app.exec())
