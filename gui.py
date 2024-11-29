@@ -95,8 +95,8 @@ class MainWindow(QMainWindow):
         for i in range(num_workers):
             identification_input = QLineEdit()
             identification_input.setFixedWidth(150)
-            working_dates_input = QLineEdit()
-            working_dates_input.setFixedWidth(150)
+            work_dates_input = QLineEdit()
+            work_dates_input.setFixedWidth(150)
             percentage_shifts_input = QLineEdit()
             percentage_shifts_input.setFixedWidth(150)
             group_input = QLineEdit()
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
             self.worker_layout.addWidget(QLabel(f"Guardian {i+1}:"), i, 0)
             self.worker_layout.addWidget(identification_input, i, 1)
             self.worker_layout.addWidget(QLabel("Fechas en que trabaja (comma-separated periods):"), i, 2)
-            self.worker_layout.addWidget(working_dates_input, i, 3)
+            self.worker_layout.addWidget(work_dates_input, i, 3)
             self.worker_layout.addWidget(QLabel("Porcentaje de jornada:"), i, 4)
             self.worker_layout.addWidget(percentage_shifts_input, i, 5)
             self.worker_layout.addWidget(QLabel("Grupo:"), i, 6)
@@ -125,7 +125,7 @@ class MainWindow(QMainWindow):
 
             self.worker_inputs.append({
                 'identification': identification_input,
-                'working_dates': working_dates_input,
+                'work_dates': work_dates_input,
                 'percentage_shifts': percentage_shifts_input,
                 'group': group_input,
                 'group_incompatibility': group_incompatibility_input,
@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
         workers = [
             Worker(
                 input['identification'].text(),
-                [period.strip() for period in input['working_dates'].text().split(',')] if input['working_dates'].text() else [],
+                [period.strip() for period in input['work_dates'].text().split(',')] if input['work_dates'].text() else [],
                 float(input['percentage_shifts'].text() or 100),  # Default to 100 if blank
                 input['group'].text() or '1',
                 input['group_incompatibility'].text().split(',') if input['group_incompatibility'].text() else [],
