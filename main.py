@@ -37,10 +37,4 @@ if __name__ == "__main__":
     window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
     window.show()
 
-    sys.exit(app.exec())
-    # Schedule shifts
-    schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
-    breakdown = prepare_breakdown(schedule)
-    export_breakdown(breakdown)
-
-    sys.exit(app.exec())
+    sys.exit(app.exec()))
