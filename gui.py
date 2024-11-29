@@ -91,8 +91,6 @@ class MainWindow(QMainWindow):
             percentage_shifts_input.setFixedWidth(150)
             group_input = QLineEdit()
             group_input.setFixedWidth(150)
-            position_incompatibility_input = QLineEdit()
-            position_incompatibility_input.setFixedWidth(150)
             group_incompatibility_input = QLineEdit()
             group_incompatibility_input.setFixedWidth(150)
             obligatory_coverage_input = QLineEdit()
@@ -108,21 +106,18 @@ class MainWindow(QMainWindow):
             self.worker_layout.addWidget(percentage_shifts_input, i, 5)
             self.worker_layout.addWidget(QLabel("Grupo:"), i, 6)
             self.worker_layout.addWidget(group_input, i, 7)
-            self.worker_layout.addWidget(QLabel("No puede hacer guardias en el Rosell:"), i, 8)
-            self.worker_layout.addWidget(position_incompatibility_input, i, 9)
-            self.worker_layout.addWidget(QLabel("Incompatibilidad con grupo:"), i, 10)
-            self.worker_layout.addWidget(group_incompatibility_input, i, 11)
-            self.worker_layout.addWidget(QLabel("Guardias obligatorias (comma-separated dates):"), i, 12)
-            self.worker_layout.addWidget(obligatory_coverage_input, i, 13)
-            self.worker_layout.addWidget(QLabel("No disponible (comma-separated dates):"), i, 14)
-            self.worker_layout.addWidget(unavailable_dates_input, i, 15)
+            self.worker_layout.addWidget(QLabel("Incompatibilidad con grupo:"), i, 8)
+            self.worker_layout.addWidget(group_incompatibility_input, i, 9)
+            self.worker_layout.addWidget(QLabel("Guardias obligatorias (comma-separated dates):"), i, 10)
+            self.worker_layout.addWidget(obligatory_coverage_input, i, 11)
+            self.worker_layout.addWidget(QLabel("No disponible (comma-separated dates):"), i, 12)
+            self.worker_layout.addWidget(unavailable_dates_input, i, 13)
 
             self.worker_inputs.append({
                 'identification': identification_input,
                 'working_dates': working_dates_input,
                 'percentage_shifts': percentage_shifts_input,
                 'group': group_input,
-                'position_incompatibility': position_incompatibility_input,
                 'group_incompatibility': group_incompatibility_input,
                 'obligatory_coverage': obligatory_coverage_input,
                 'unavailable_dates': unavailable_dates_input
@@ -143,7 +138,6 @@ class MainWindow(QMainWindow):
                 [period.strip() for period in input['working_dates'].text().split(',')] if input['working_dates'].text() else [],
                 float(input['percentage_shifts'].text() or 100),  # Default to 100 if blank
                 input['group'].text() or '1',
-                input['position_incompatibility'].text().split(',') if input['position_incompatibility'].text() else [],
                 input['group_incompatibility'].text().split(',') if input['group_incompatibility'].text() else [],
                 [date.strip() for date in input['obligatory_coverage'].text().split(',')] if input['obligatory_coverage'].text() else [],
                 [date.strip() for date in input['unavailable_dates'].text().split(',')] if input['unavailable_dates'].text() else []
