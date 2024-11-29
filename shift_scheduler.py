@@ -7,7 +7,7 @@ import csv
 class Worker:
     def __init__(self, identification, work_dates=None, percentage=100.0, group='1', group_incompatibility=None, obligatory_coverage=None, unavailable_dates=None):
         self.identification = identification
-        self.working_dates = work_dates if work_dates else []
+        self.work_dates = work_dates if work_dates else []
         self.percentage_shifts = float(percentage) if percentage else 100.0
         self.group = group if group else '1'
         self.group_incompatibility = group_incompatibility if group_incompatibility else []
@@ -144,8 +144,8 @@ def schedule_shifts(work_periods, holidays, workers, min_distance, max_shifts_pe
 
     # Step 1: Assign obligatory coverage shifts
     for worker in workers:
-        if not worker.working_dates:
-            worker.working_dates = valid_work_periods
+        if not worker.work_dates:
+            worker.work_dates = valid_work_periods
 
         for date_str in worker.obligatory_coverage:
             cleaned_date_str = date_str.strip().replace('.', '').replace(' ', '')
