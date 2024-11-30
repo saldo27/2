@@ -5,7 +5,7 @@ from gui import MainWindow
 from worker import Worker
 from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown
 
-if __name__ == "__main__":
+def main():
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
@@ -39,3 +39,6 @@ if __name__ == "__main__":
     window = MainWindow(work_periods, holidays, workers, min_distance, max_shifts_per_week, jobs_per_day)
     window.show()
     sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
