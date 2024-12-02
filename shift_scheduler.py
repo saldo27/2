@@ -44,7 +44,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
         date = datetime.strptime(date.strip(), "%d/%m/%Y")  # Ensure date is a datetime object
 
     # Check for group incompatibility
-    if schedule and workers:
+    if schedule and workers and not override:
         for job_schedule in schedule.values():
             if date.strftime("%d/%m/%Y") in job_schedule:
                 assigned_worker_id = job_schedule[date.strftime("%d/%m/%Y")]
@@ -60,12 +60,13 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
         return False
 
     # Check if the date is within the worker's working dates range
-    for start_date, end_date in worker.work_dates:
-        if start_date <= date <= end_date:
-            break
-    else:
-        logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
-        return False
+    if not override:
+        for start_date, end_date in worker.work_dates:
+            if start_date <= date <= end_date:
+                break
+        else:
+            logging.debug(f"Worker {worker.identification} cannot work on {date} because it is outside their working dates.")
+            return False
 
     if not override:
         # Adjust the minimum distance for workers performing less than 100% of shifts
@@ -145,25 +146,25 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     calculate_shift_quota(workers, total_days, jobs_per_day)
 
     
-    for worker in workers:
-        if not worker.work_dates:
-            worker.work_dates = valid_work_periods
+for worker in workers:
+    if not worker.work_dates:
+        worker.work_dates = valid_work_periods
 
-        for date_str in worker.obligatory_coverage:
-            if date_str.strip():
-                date = datetime.strptime(date_str.strip(), "%d/%m/%Y")
-                logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
-                for job in jobs:
-                    if can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers):
-                        assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, obligatory=True)
-                        last_assigned_job[worker.identification] = job
-                        last_assigned_day[worker.identification] = date.weekday()
-                        day_rotation_tracker[worker.identification][date.weekday()] = True
-                        logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
-                        break
-                else:
-                    logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
-                    continue
+    for date_str in worker.obligatory_coverage:
+        if date_str.strip():
+            date = datetime.strptime(date_str.strip(), "%d/%m/%Y")
+            logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
+            for job in jobs:
+                if can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, override=True, schedule=schedule, workers=workers):
+                    assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, obligatory=True)
+                    last_assigned_job[worker.identification] = job
+                    last_assigned_day[worker.identification] = date.weekday()
+                    day_rotation_tracker[worker.identification][date.weekday()] = True
+                    logging.debug(f"Assigned obligatory coverage shift for Worker {worker.identification} on {date} for job {job}")
+                    break
+            else:
+                logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
+                continue
                 
     for start_date, end_date in valid_work_periods:
         for date in generate_date_range(start_date, end_date):
