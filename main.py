@@ -3,7 +3,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 from gui import MainWindow
 from worker import Worker
-from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown, validate_schedule
+from shift_scheduler import schedule_shifts, prepare_breakdown, export_breakdown
 
 if __name__ == "__main__":
     app = QApplication.instance()
@@ -39,10 +39,6 @@ if __name__ == "__main__":
 
     # Schedule shifts
     schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
-    
-    # Validate schedule
-    validate_schedule(schedule, workers, min_distance, max_shifts_per_week)
-    
     breakdown = prepare_breakdown(schedule)
     export_breakdown(breakdown)
 
