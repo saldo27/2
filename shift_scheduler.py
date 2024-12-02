@@ -259,7 +259,7 @@ def export_breakdown(breakdown):
 if __name__ == "__main__":
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
-    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ").split(',')
+    holidays = input("Enter holidays (e.g., 09/10/2024, separated by commas): ').split(',')
     jobs = input("Enter workstations (e.g., A, B, C, separated by commas): ").split(',')
     min_distance = int(input("Enter minimum distance between work shifts (in days): "))
     max_shifts_per_week = int(input("Enter maximum shifts that can be assigned per week: "))
@@ -269,5 +269,9 @@ if __name__ == "__main__":
     workers = [Worker(f"W{i+1}") for i in range(num_workers)]
 
     schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
+    
+    # Validate schedule
+    validate_schedule(schedule, workers, min_distance, max_shifts_per_week)
+    
     breakdown = prepare_breakdown(schedule)
     export_breakdown(breakdown)
