@@ -101,7 +101,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
 
     return True
 
-def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week):
+def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, obligatory=False):
     logging.debug(f"Assigning worker {worker.identification} to job {job} on {date.strftime('%d/%m/%Y')}")
     last_shift_dates[worker.identification].append(date)
     schedule[job][date.strftime("%d/%m/%Y")] = worker.identification
@@ -110,6 +110,8 @@ def assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weeken
     if is_weekend(date) or is_holiday(date.strftime("%d/%m/%Y"), holidays_set):
         weekend_tracker[worker.identification] += 1
     worker.shift_quota -= 1
+    if obligatory:
+        worker.obligatory_coverage_shifts[date] = job  # Mark obligatory coverage shift
     logging.debug(f"Worker {worker.identification} assigned to job {job} on {date.strftime('%d/%m/%Y')}. Updated schedule: {schedule[job][date.strftime('%d/%m/%Y')]}")
 
 def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week, previous_shifts=[]):
@@ -142,6 +144,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     jobs_per_day = len(jobs)
     calculate_shift_quota(workers, total_days, jobs_per_day)
 
+    
     for worker in workers:
         if not worker.work_dates:
             worker.work_dates = valid_work_periods
@@ -152,7 +155,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 logging.debug(f"Trying to assign obligatory coverage shift for Worker {worker.identification} on {date} for jobs {jobs}")
                 for job in jobs:
                     if can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_set, weekly_tracker, job, job_count, min_distance, max_shifts_per_week, schedule=schedule, workers=workers):
-                        assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
+                        assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week, obligatory=True)
                         last_assigned_job[worker.identification] = job
                         last_assigned_day[worker.identification] = date.weekday()
                         day_rotation_tracker[worker.identification][date.weekday()] = True
@@ -167,6 +170,8 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
         for date in generate_date_range(start_date, end_date):
             date_str = date.strftime("%d/%m/%Y")
             for job in jobs:
+                if any(worker.obligatory_coverage_shifts.get(date) == job for worker in workers):
+                    continue  # Skip if obligatory coverage shift exists
                 logging.debug(f"Processing job '{job}' on date {date_str}")
 
                 assigned = False
