@@ -127,15 +127,14 @@ class MainWindow(QMainWindow):
                 'obligatory_coverage': obligatory_coverage_input,
                 'unavailable_dates': unavailable_dates_input
             })
-
-    def schedule_shifts(self):
+def schedule_shifts(self):
     # Get inputs
-        work_periods = self.work_periods_input.text().split(',')
-        holidays = self.holidays_input.text().split(',')
-        jobs = self.jobs_input.text().split(',')
-        num_workers = int(self.num_workers_input.text())
-        min_distance = int(self.min_distance_input.text())
-        max_shifts_per_week = int(self.max_shifts_per_week_input.text())
+    work_periods = self.work_periods_input.text().split(',')
+    holidays = self.holidays_input.text().split(',')
+    jobs = self.jobs_input.text().split(',')
+    num_workers = int(self.num_workers_input.text())
+    min_distance = int(self.min_distance_input.text())
+    max_shifts_per_week = int(self.max_shifts_per_week_input.text())
     # Create workers list from user input
     workers = [
         Worker(
@@ -150,6 +149,7 @@ class MainWindow(QMainWindow):
         )
         for input in self.worker_inputs
     ]
+    
     # Schedule shifts
     schedule = schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shifts_per_week)
     # Display the schedule
@@ -160,6 +160,7 @@ class MainWindow(QMainWindow):
         for date, worker in shifts.items():
             output += f"  {date}: {worker}\n"
     self.output_display.setText(output)
+    
     def export_to_ical(self):
         options = QFileDialog.Options()
         filePath, _ = QFileDialog.getSaveFileName(self, "Save Schedule as iCalendar", "", "iCalendar Files (*.ics);;All Files (*)", options=options)
