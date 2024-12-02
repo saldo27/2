@@ -206,6 +206,41 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
     logging.debug(f"Final schedule: {schedule}")
     return schedule
 
+def validate_schedule(schedule, workers, min_distance, max_shifts_per_week):
+    last_shift_dates = {worker.identification: [] for worker in workers}
+    weekend_tracker = {worker.identification: 0 for worker in workers}
+    weekly_tracker = defaultdict(lambda: defaultdict(int))
+    
+    for job, shifts in schedule.items():
+        for date_str, worker_id in shifts.items():
+            date = datetime.strptime(date_str, "%d/%m/%Y")
+            worker = next(w for w in workers if w.identification == worker_id)
+            
+            # Check minimum distance
+            if last_shift_dates[worker_id]:
+                last_date = last_shift_dates[worker_id][-1]
+                days_diff = (date - last_date).days
+                if days_diff < min_distance:
+                    print(f"Violation: Worker {worker_id} assigned shifts too close ({days_diff} days) on {last_date.strftime('%d/%m/%Y')} and {date_str}.")
+            
+            # Track shift dates
+            last_shift_dates[worker_id].append(date)
+            
+            # Check weekend/holiday limits
+            if is_weekend(date) or is_holiday(date_str, holidays_set):
+                weekend_tracker[worker_id] += 1
+                if weekend_tracker[worker_id] > 4:
+                    print(f"Violation: Worker {worker_id} assigned more than 4 weekend/holiday shifts.")
+            
+            # Check weekly shift limits
+            week_number = date.isocalendar()[1]
+            weekly_tracker[worker_id][week_number] += 1
+            if weekly_tracker[worker_id][week_number] > max_shifts_per_week:
+                print(f"Violation: Worker {worker_id} assigned more than {max_shifts_per_week} shifts in week {week_number}.")
+
+# Example usage
+validate_schedule(schedule, workers, min_distance, max_shifts_per_week)
+
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
     for job, shifts in schedule.items():
