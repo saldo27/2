@@ -2,5 +2,5 @@ Application to distribute on-call shifts with special requirements and PDF expor
 Shift distribution,
 Reduction of working hours.
 Group incompatibility
-Position blocking.
-v.2
+Obligatory shifts.
+v.2.5
