@@ -48,7 +48,7 @@ def can_work_on_date(worker, date, last_shift_dates, weekend_tracker, holidays_s
         for job_schedule in schedule.values():
             if date.strftime("%d/%m/%Y") in job_schedule:
                 assigned_worker_id = job_schedule[date.strftime("%d/%m/%Y")]
-                assigned_worker = next((w for w in workers if w.identification == assigned_worker_id), None)
+                assigned_worker = next((w for w in workers if worker.identification == assigned_worker_id), None)
                 if assigned_worker:
                     logging.debug(f"Assigned worker {assigned_worker.identification} found for job on {date}")
                     if any(group == assigned_worker.group for group in worker.group_incompatibility):
@@ -184,17 +184,17 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                             return schedule
 
                     worker = max(available_workers, key=lambda w: (
-                        (date - last_shift_dates[w.identification][-1]).days if last_shift_dates[w.identification] else float('inf'),
+                        (date - last_shift_dates[worker.identification][-1]).days if last_shift_dates[worker.identification] else float('inf'),
                         w.shift_quota,
                         w.percentage_shifts,
-                        last_assigned_job[w.identification] != job,
-                        last_assigned_day[w.identification] != date.weekday(),
-                        not day_rotation_tracker[w.identification][date.weekday()]
+                        last_assigned_job[worker.identification] != job,
+                        last_assigned_day[worker.identification] != date.weekday(),
+                        not day_rotation_tracker[worker.identification][date.weekday()]
                     ))
                     assign_worker_to_shift(worker, date, job, schedule, last_shift_dates, weekend_tracker, weekly_tracker, job_count, holidays_set, min_distance, max_shifts_per_week)
                     last_assigned_job[worker.identification] = job
                     last_assigned_day[worker.identification] = date.weekday()
-                    day_rotation_tracker[w.identification][date.weekday()] = True
+                    day_rotation_tracker[worker.identification][date.weekday()] = True
                     logging.debug(f"Assigned shift for Worker {worker.identification} on {date} for job {job}")
                     assigned = True
 
@@ -205,6 +205,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
 
     logging.debug(f"Final schedule: {schedule}")
     return schedule
+
 def prepare_breakdown(schedule):
     breakdown = defaultdict(list)
     for job, shifts in schedule.items():
