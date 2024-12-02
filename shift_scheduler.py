@@ -164,8 +164,7 @@ def schedule_shifts(work_periods, holidays, jobs, workers, min_distance, max_shi
                 else:
                     logging.debug(f"Worker {worker.identification} cannot be assigned for obligatory coverage on {date} for any job.")
                     continue
-                break
-
+                
     for start_date, end_date in valid_work_periods:
         for date in generate_date_range(start_date, end_date):
             date_str = date.strftime("%d/%m/%Y")
