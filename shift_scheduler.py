@@ -222,7 +222,15 @@ def export_breakdown(breakdown):
         for date, job in shifts:
             output += f"  {date}: {job}\n"
     return output
-
+    
+def export_schedule_to_csv(schedule, filename='shift_schedule.csv'):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Job', 'Date', 'Worker'])
+        for job, shifts in schedule.items():
+            for date, worker in shifts.items():
+                writer.writerow([job, date, worker])
+                
 if __name__ == "__main__":
     # User input for the required parameters
     work_periods = input("Enter work periods (e.g., 01/10/2024-31/10/2024, separated by commas): ").split(',')
